@@ -1,23 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NB_CHAR 1  /* On lit caractère par caractère */
+#define NB_CHAR 1
 
 
-int main(){
+void usage(char *s){
+    printf("Usage %s : <fichier> <entier>, <entier> facultatif -> nombre de caractère lu", s);
+}
+
+
+int main(int argc, char *argv[]){
 
     char c[NB_CHAR];   /* buffer contenant le caractère lu */
     FILE* fich = NULL;
     size_t taille_carac = sizeof(char);   /* taille d'un caractère dans le fichier */
+    int taille;
 
-    if ((fich = fopen("fichier.txt", "rb")) == NULL){   /* ouverture du fichier en lecture binaire */
+    if (argc < 2){
+        usage(argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    if (argc == 2){
+        taille = 10;
+    }
+    else {
+        taille = atoi(argv[2]);
+    }
+
+    if ((fich = fopen(argv[1], "rb")) == NULL){   /* ouverture du fichier en lecture binaire */
         printf("Erreur d'ouverture du fichier fichier.txt\n");
     }
 
-    /* lecture jusqu'à ce que ce ne soit plus possible, et affichage du caractère */
-    /* c : buffer, taille_carac : taille d'un caractère, NB_CHAR : lecture d'un caractère */
-    while (fread(c, taille_carac, NB_CHAR, fich) != 0){
+    /* ??? */
+    /* c : buffer, taille_carac : taille d'un caractère, NB_CHAR : lecture de "taille" caractères */
+    while (fread(c, taille_carac, NB_CHAR, fich) != 0 && taille > 0){
         printf("%s", c);
+        taille--;
     }
 
     /*  QESTION 2 
