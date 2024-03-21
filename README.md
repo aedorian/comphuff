@@ -15,4 +15,8 @@ PRESENTATION
 - codage de Huffman: caractères codés sur nombre différent de bits
   - codes caractères fréquents sont courts, ceux des rares sont longs
   - UNE façon de décoder le fichier compressé
-  - 
+
+## Questions
+
+- 4.1. c'est à dire "une partie" du fichier? fread avec une certaine taille?
+- 4.1. comment mettre deux questions en une seule partie?
