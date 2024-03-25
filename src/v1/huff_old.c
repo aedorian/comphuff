@@ -112,7 +112,10 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    fic = fopen(argv[1], "r");
+    if ((fic = fopen(argv[1], "r")) == NULL){
+       printf("Erreur d'ouverture du fichier \n");
+       exit(EXIT_FAILURE);
+    }
 
     initialiser_occurences(tab);
     initialiser_arbre_huffman(arbre_huffman);
