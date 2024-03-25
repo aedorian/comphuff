@@ -28,10 +28,10 @@ int main(int argc, char *argv[]){
     }
 
     if ((fich = fopen(argv[1], "rb")) == NULL){   /* ouverture du fichier en lecture binaire */
-        printf("Erreur d'ouverture du fichier fichier.txt\n");
+        printf("Erreur d'ouverture du fichier %s\n", argv[1]);
     }
 
-    /* ??? */
+    /* Lit caractère par caractère le fichier passer en paramètre */
     /* c : buffer, taille_carac : taille d'un caractère, NB_CHAR : lecture de "taille" caractères */
     while (fread(c, taille_carac, NB_CHAR, fich) != 0 && taille > 0){
         printf("%s", c);
@@ -44,8 +44,8 @@ int main(int argc, char *argv[]){
     
     
     / * ouverture du fichier * /
-    if ((fich = fopen("fichier.txt", "r")) == NULL){
-        printf("Erreur d'ouverture du fichier fichier.txt\n");
+    if ((fich = fopen(argv[1], "r")) == NULL){
+        printf("Erreur d'ouverture du fichier %s\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 
