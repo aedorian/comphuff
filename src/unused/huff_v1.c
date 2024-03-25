@@ -26,6 +26,7 @@ int main() {
     }
 
     /* appel de la fonction occurence */
+    
     occurence(fic, tab);
 
     /* on affiche les occurences de chaque caractère (si il y a eu une occurence) */
