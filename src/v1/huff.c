@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <MLV/MLV_all.h>
 
 #include "arbre.h"
 
@@ -46,10 +47,7 @@ void afficher_occurences(noeud * arbre_huffman[256]) {
             c = arbre_huffman[i]->c; /* caractère actuel */
 
             /* affichage spécial pour les caractère "invisibles" */
-            if (c == '\n') printf("\\n");
-            else if (c == ' ') printf("espace");
-            else if (c == '\t') printf("tab");
-            else printf("%c", c);
+            affiche_car(c);
 
             /* afficher le nombre d'occurences */
             printf(" : %d\n", arbre_huffman[i]->occurence);
@@ -78,11 +76,13 @@ int creer_noeuds_caracteres(int tab[256], noeud * arbre_huffman[256]) {
 void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
     int i;
     int min = INT_MAX;
-    
+
     *i2 = -1;
     *i1 = -1;
 
     for (i = 0; i < 256; i++) {
+        if (arbre_huffman[i] != NULL) printf("%d ", arbre_huffman[i]->occurence);
+        
         if (arbre_huffman[i] != NULL && arbre_huffman[i]->occurence <= min) {
             *i2 = *i1; /* i2 prend l'ancienne valeur de i1 */
             *i1 = i; /* i1 devient l'indice du noeud avec le plus petit nombre d'occurences */
@@ -90,18 +90,35 @@ void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
             min = arbre_huffman[i]->occurence;
         }
     }
+
+    /* si il n'y a plus que deux éléments, et que occ(dernier élément) > occ(arbre_huffman[*i1]) */
+    if (*i2 == -1) {
+        for (i = *i1; i < 256; i++) {
+            if (arbre_huffman[i] != NULL && i != *i1) {
+                *i2 = i; /* i2 prend l'ancienne valeur de i1 */
+                break;
+            }
+        }
+    }
 }
 
 void debug_huffman(noeud * huff[], int taille) {
     int i;
 
-    printf("début debug\n");
+    printf("---------------- début debug ---------------------------------------\n");
 
     for (i = 0; i < taille; i++) {
+
+        /*
         printf("%d : ", i);
         if (huff[i] == NULL) printf("-\n");
         else printf("%c (%d)\n", huff[i]->c, huff[i]->occurence);
+        */
+
+        afficher_arbre(huff[i]);
     }
+
+    printf("---------------- fin debug ---------------------------------------\n");
 }
 
 /* 4.2.7 */
@@ -111,7 +128,7 @@ void creer_noeud(noeud * tab[], int taille) {
     
     deux_entiers_petits(tab, &i1, &i2);
     
-    printf("indice %d : %c, indice %d : %c\n", i1, tab[i1]->c, i2, tab[i2]->c);
+    printf("indice %d, indice %d\n", i1,  i2);
 
     /* check i1 et i2 != -1 ? */
 
@@ -123,14 +140,19 @@ void creer_noeud(noeud * tab[], int taille) {
         exit(EXIT_FAILURE);
     }
 
+    /* TROUVER LA POSITION NULL LA PLUS PROCHE? */
+
     /* pas sûr pour la définition des membres */
     new->c = 0; /* ??? */
-    new->occurence = tab[0];
+    new->occurence = tab[i1]->occurence + tab[i2]->occurence;
     new->codage = 0; /* ??????? */
     new->nb_bits = 0; /* pas encore défini */
 
-    new->gauche = NULL;
-    new->droit = NULL;
+    new->gauche = tab[i1];
+    new->droit = tab[i2];
+
+    tab[i1] = new;
+    tab[i2] = NULL;
 }
 
 void usage(char *s){
@@ -144,12 +166,18 @@ int main(int argc, char *argv[]) {
     noeud * arbre_huffman[256]; /* pointeurs vers des noeuds */
     int n_huffman; /* taille du tableau arbre_huffman */
 
+    int i;
+
     if (argc < 2){
         usage(argv[0]);
         exit(EXIT_FAILURE);
     }
 
     fic = fopen(argv[1], "r");
+    if (fic == NULL) {
+        fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier\n");
+        exit(EXIT_FAILURE);
+    }
 
     initialiser_occurences(tab);
     initialiser_arbre_huffman(arbre_huffman);
@@ -166,9 +194,25 @@ int main(int argc, char *argv[]) {
     debug_huffman(arbre_huffman, n_huffman);
 
     /* TEST */
-    creer_noeud(arbre_huffman, 256);
+    i = n_huffman;
+    while (i != 1) {
 
-    debug_huffman(arbre_huffman, n_huffman);
+        creer_noeud(arbre_huffman, 256);
+
+        i--;
+
+        debug_huffman(arbre_huffman, n_huffman);
+    }
+
+    printf("fin de création des noeuds\n");
+
+    i = 0;
+    while (arbre_huffman[i] == NULL) i++;
+
+    /* le premier pointeur est l'arbre final */
+    arbre_huffman[0] = arbre_huffman[i];
+    
+    afficher_arbre_graphique(arbre_huffman[0]);
     /* FIN TEST */
 
     
