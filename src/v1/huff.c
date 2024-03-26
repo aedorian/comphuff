@@ -165,8 +165,6 @@ int main(int argc, char *argv[]) {
 
     debug_huffman(arbre_huffman, n_huffman);
 
-    exit(EXIT_SUCCESS);
-
     /* TEST */
     creer_noeud(arbre_huffman, 256);
 

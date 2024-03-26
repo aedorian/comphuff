@@ -22,3 +22,7 @@ noeud * creer_feuille(int *tab, int index) {
 
     return n;
 }
+
+int est_feuille(noeud * n) {
+    return (n->gauche == NULL && n->droit == NULL);
+}
