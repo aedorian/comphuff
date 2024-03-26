@@ -18,20 +18,10 @@ PRESENTATION
 
 # Ajouté depuis dernière fois
 
-add (4.1):
-- makefile
-- afficher_occurences(int tab[256])
-- initialiser_occurences(int tab[256])
-- ta fonction usage(char *s)
-- l'ajout de l'ouverture du fichier en paramètre
-
-add (4.2):
-- arbre.h, arbre.c
-- initialiser_arbre_huffman
-- afficher_occurences CHANGE et prend maintenant un arbre_huffman, pas un tab d'occurences
+- noeuds sont au début du tableau normalement lors de la création à partir du nombre d'occurence des caractères
 
 atension:
+- (4.2.7) arbre "Une banane" différent? pas grave?
 - (4.2) "codage dans l'arbre" même chose que nb d'occurences? PAS SÛR DANS arbre.c à l'assignation de n->codage
 - (4.2) j'ai séparé afficher_occurences et creer_noeuds_caracteres, mieux dans une seule boucle?
 - (4.2.6) si je mets un < au lieu de <= pour le test min, change des choses (mais <= a l'air mieux)
-- CHANGER VERSION POUR METTRE NOEUDS AU DEBUT DU TABLEAU?
