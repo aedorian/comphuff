@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     }
 
     if ((fic = fopen(argv[1], "r")) == NULL){
-       printf("Erreur d'ouverture du fichier \n");
+       printf("Erreur d'ouverture du fichier %s\n", argv[1]);
        exit(EXIT_FAILURE);
     }
 
