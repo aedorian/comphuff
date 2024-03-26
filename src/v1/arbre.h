@@ -15,4 +15,6 @@ typedef struct noeud {
 
 noeud * creer_feuille(int *tab, int index);
 
+int est_feuille(noeud * n);
+
 #endif /* _ARBRE_H_ */

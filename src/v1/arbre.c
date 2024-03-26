@@ -5,7 +5,7 @@
 
 noeud * creer_feuille(int *tab, int index) {
     noeud * n;
-
+    
     n = (noeud *) malloc (sizeof(noeud));
     if (n == NULL) {
         fprintf(stderr, "Erreur creer_feuille: erreur d'allocation mémoire\n");
@@ -14,7 +14,7 @@ noeud * creer_feuille(int *tab, int index) {
 
     n->c = index;
     n->occurence = tab[index];
-    n->codage = tab[index]; /* ??????? */
+    n->codage = 0; /* ??????? */
     n->nb_bits = 0; /* pas encore défini */
 
     n->gauche = NULL;

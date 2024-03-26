@@ -57,16 +57,20 @@ void afficher_occurences(noeud * arbre_huffman[256]) {
     }
 }
 
-/* crée une structure noeud pour chaque caractère contenu dans le fichier */
-void creer_noeuds_caracteres(int tab[256], noeud * arbre_huffman[256]) {
+/* 4.2.4 crée une structure noeud pour chaque caractère contenu dans le fichier */
+int creer_noeuds_caracteres(int tab[256], noeud * arbre_huffman[256]) {
     int i;
+    int i_huffman = 0; /* index dans arbre_huffman */
     
     for (i = 0; i < 256; i++) {
         if (tab[i] != 0) {
-
-            arbre_huffman[i] = creer_feuille(tab, i);
+            
+            arbre_huffman[i_huffman] = creer_feuille(tab, i);;
+            i_huffman++;
         }
     }
+
+    return i_huffman; /* taille du tableau */
 }
 
 /* 4.2.6 */
@@ -88,13 +92,45 @@ void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
     }
 }
 
+void debug_huffman(noeud * huff[], int taille) {
+    int i;
+
+    printf("début debug\n");
+
+    for (i = 0; i < taille; i++) {
+        printf("%d : ", i);
+        if (huff[i] == NULL) printf("-\n");
+        else printf("%c (%d)\n", huff[i]->c, huff[i]->occurence);
+    }
+}
+
 /* 4.2.7 */
 void creer_noeud(noeud * tab[], int taille) {
     int i1, i2;
+    noeud * new;
     
     deux_entiers_petits(tab, &i1, &i2);
     
     printf("indice %d : %c, indice %d : %c\n", i1, tab[i1]->c, i2, tab[i2]->c);
+
+    /* check i1 et i2 != -1 ? */
+
+    /* création du nouveau noeud */
+
+    new = (noeud *) malloc (sizeof(noeud));
+    if (new == NULL) {
+        fprintf(stderr, "Erreur creer_noeud: erreur d'allocation mémoire\n");
+        exit(EXIT_FAILURE);
+    }
+
+    /* pas sûr pour la définition des membres */
+    new->c = 0; /* ??? */
+    new->occurence = tab[0];
+    new->codage = 0; /* ??????? */
+    new->nb_bits = 0; /* pas encore défini */
+
+    new->gauche = NULL;
+    new->droit = NULL;
 }
 
 void usage(char *s){
@@ -106,6 +142,7 @@ int main(int argc, char *argv[]) {
     FILE * fic = NULL;
     int tab[256]; /* nombre d'occurences de chaque caractère */
     noeud * arbre_huffman[256]; /* pointeurs vers des noeuds */
+    int n_huffman; /* taille du tableau arbre_huffman */
 
     if (argc < 2){
         usage(argv[0]);
@@ -121,14 +158,22 @@ int main(int argc, char *argv[]) {
     occurence(fic, tab);
 
     /* 4.2.5 */
-    creer_noeuds_caracteres(tab, arbre_huffman);
+    n_huffman = creer_noeuds_caracteres(tab, arbre_huffman);
 
     /* on affiche les occurences de chaque caractère (si il y a eu une occurence) */
     afficher_occurences(arbre_huffman);
 
+    debug_huffman(arbre_huffman, n_huffman);
+
+    exit(EXIT_SUCCESS);
+
     /* TEST */
     creer_noeud(arbre_huffman, 256);
+
+    debug_huffman(arbre_huffman, n_huffman);
     /* FIN TEST */
+
+    
 
     fclose(fic);
 

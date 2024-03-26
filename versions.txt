@@ -16,3 +16,4 @@ atension:
 - (4.2) "codage dans l'arbre" même chose que nb d'occurences? PAS SÛR DANS arbre.c à l'assignation de n->codage
 - (4.2) j'ai séparé afficher_occurences et creer_noeuds_caracteres, mieux dans une seule boucle?
 - (4.2.6) si je mets un < au lieu de <= pour le test min, change des choses (mais <= a l'air mieux)
+- CHANGER VERSION POUR METTRE NOEUDS AU DEBUT DU TABLEAU?
