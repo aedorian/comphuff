@@ -10,6 +10,22 @@ A FAIRE
 PRESENTATION
 - démo et étude du taux de compression
 
+# ENTETE
+(nb_char_differents)[(char)(nb_bits)(code)...]
+- structure alphabet
+- nom origine fichier?
+
+# CONTENU
+code compressé des caractères du fichier
+
+- soit sauvegarde arbre directement
+- soit chaque deux octets (char)(code)
+	-> et recrée arbre petit à petit
+- nombre max de nb_bits possible?
+
+# Bugs
+- erreur avec mlv draw text
+
 # Notes
 
 - faire un malloc avec toute la taille direct? pour fread
