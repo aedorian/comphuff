@@ -12,9 +12,7 @@ PRESENTATION
 
 # Notes
 
-- codage de Huffman: caractères codés sur nombre différent de bits
-  - codes caractères fréquents sont courts, ceux des rares sont longs
-  - UNE façon de décoder le fichier compressé
+- faire un malloc avec toute la taille direct? pour fread
 
 # Ajouté depuis dernière fois
 
