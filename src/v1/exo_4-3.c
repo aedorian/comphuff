@@ -22,26 +22,15 @@ void creer_code(noeud * element, int code, int profondeur, noeud * alphabet[256]
         
         affichage_code(profondeur, code);
         /* stockage dans la structure alphabet */
-        alphabet[element -> c] = element;
+        alphabet[(int)element -> c] = element;
     }
     else {
-        creer_code(element -> gauche, code * 2, profondeur + 1);
-        creer_code(element -> droit, code * 2 + 1, profondeur + 1);
+        creer_code(element -> gauche, code * 2, profondeur + 1, alphabet);
+        creer_code(element -> droit, code * 2 + 1, profondeur + 1, alphabet);
     }
 }
 
 int main(){
-
-    affichage_code(1, 0);
-    printf("\n");
-    affichage_code(2, 0);
-    printf("\n");
-    affichage_code(4, 0);
-    printf("\n");
-    affichage_code(5, 5);
-    printf("\n");
-    affichage_code(8, 69);
-    printf("\n");
-
+    
     exit(EXIT_FAILURE);
 }
