@@ -22,7 +22,7 @@ noeud * creer_feuille(int *tab, int index) {
 
     n->c = index;
     n->occurence = tab[index];
-    n->codage = 0; /* ??????? */
+    n->codage = -1; /* ??????? */
     n->nb_bits = 0; /* pas encore défini */
 
     n->gauche = NULL;
@@ -82,6 +82,7 @@ void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, i
     afficher_arbre_graphique_aux(a->gauche, pos_x - dec_x, pos_y + AFF_DEC_Y, pos_x, pos_y, dec_x / 2 + dec_x / 5);
     afficher_arbre_graphique_aux(a->droit, pos_x + dec_x, pos_y + AFF_DEC_Y, pos_x, pos_y, dec_x / 2 + dec_x / 5);
 
+    
     MLV_draw_text(pos_x, pos_y, aff, MLV_COLOR_WHITE);
 
     if ((a->occurence / 10) == 0) {
@@ -92,6 +93,7 @@ void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, i
         aff[1] = (a->occurence % 10)  + '0';
         aff[2] = '\0';
     }
+    
     MLV_draw_text(pos_x, pos_y + 15, aff, MLV_COLOR_GRAY);
   }
 }
