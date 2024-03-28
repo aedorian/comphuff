@@ -262,9 +262,6 @@ int main(int argc, char *argv[]) {
 
     /* appel de la fonction occurence */
     occurence(fic, tab);
-
-    /* on ferme le fichier */
-    fclose(fic);
     
     /* 4.2.5 */
     n_huffman = creer_noeuds_caracteres(tab, arbre_huffman);
@@ -298,8 +295,10 @@ int main(int argc, char *argv[]) {
 
     /* créer le fichier compressé */
     /* ATTENTION POUR ETENDRE LES OPTIONS */
-    creer_compresse(argv[1], n_huffman, alphabet);
-    
+    creer_compresse(argv[1], fic, n_huffman, alphabet);
+
+    /* on ferme le fichier */
+    fclose(fic);
     
     afficher_arbre_graphique(arbre_huffman[0]);
 
