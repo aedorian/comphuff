@@ -1,6 +1,8 @@
 # Projet programmation impérative 3
 ## OUVERTURE BINAIRE DE LA BASE
 
+`xxd -b banane.txt.comphuff`
+
 A FAIRE
 - code source + makefile
 - notice README (comment créer exécutable, principal, exécutable de génération de fichiers de test et comment générer les fichiers de test)
