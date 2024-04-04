@@ -20,6 +20,8 @@ typedef struct noeud {
 
 noeud * creer_feuille(int *tab, int index);
 
+noeud * creer_noeud(char c, noeud * filsgauche, noeud * filsdroit);
+
 int est_feuille(noeud * n);
 
 void afficher_arbre_aux(noeud * a, int profondeur, int droit);

@@ -31,6 +31,21 @@ noeud * creer_feuille(int *tab, int index) {
     return n;
 }
 
+noeud * creer_noeud(char c, noeud * filsgauche, noeud * filsdroit) {
+  noeud * a;
+  a = (noeud *) malloc (sizeof(noeud));
+  if (a == NULL) {
+    fprintf(stderr, "Erreur de création de l'arbre\n");
+    exit(EXIT_FAILURE);
+  }
+
+  a->c = c;
+  a->gauche = filsgauche;
+  a->droit = filsdroit;
+
+  return a;
+}
+
 int est_feuille(noeud * n) {
     return (n->gauche == NULL && n->droit == NULL);
 }

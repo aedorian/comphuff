@@ -3,6 +3,12 @@
 
 `xxd -b banane.txt.comphuff`
 
+# TOM BONJOUR
+- reste juste à écrire dans un fichier
+- rename fonction boucle_alphabet() en boucle_decomp() (mix lecture alphabet et reste)
+- pas sûr du char des noeuds de l'arbre qui ne sont pas des feuilles
+- pas check de est_feuille dans lire_bit_arbre
+
 A FAIRE
 - code source + makefile
 - notice README (comment créer exécutable, principal, exécutable de génération de fichiers de test et comment générer les fichiers de test)
