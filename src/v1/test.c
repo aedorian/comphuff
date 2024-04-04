@@ -16,7 +16,7 @@ int puiss_2(int x){
 void char2bin(char c, int buffer_c[8]) {
     int i;
     for (i = 7; i >= 0; i--) {
-        buffer_c[i] = c % 2;
+        buffer_c[i] = (unsigned int)c % 2;
         c = c >> 1;
     }
 }
@@ -25,14 +25,20 @@ void char2bin(char c, int buffer_c[8]) {
 int bin2int(int buffer_r[8], int taille) {
     int i;
     int res = 0;
-    for (i = taille-1; i >= 0; i--) {
+    for (i = taille-1; i >= 0; i--) { /* on parcourt le tableau de droite à gauche */
         if (buffer_r[i] == 1) {
-            res += puiss_2(i);
+            res += puiss_2(taille - 1 - i);
         }
     }
 
     return res;
 }
+
+void dbg(char * s) {
+    printf("%s\n", s);
+}
+
+/* void lire_fich(FILE * fic, int */
 
 void boucle_alphabet() {
     FILE * f = NULL;
@@ -45,11 +51,11 @@ void boucle_alphabet() {
     int taille_code = 0; /* taille du codage */
     /* suite de: CHAR (8 bits) - TAILLE (3 bits) - CODE (TAILLE (1 à 8 bits)) */
 
-    int i;
+    int i, j;
     char c; /* utilisé pour lire 8 bits dans le fichier compressé */
     int buffer_c[8]; /* "pelleteuse": c mais en tableau de int */
     int buffer_r[8]; /* buffer de lecture */
-    int i_r = 0; /* position actuelle dans buffer_r */
+    int i_r; /* position actuelle dans buffer_r */
     int lu;
 
     f = fopen("banane.txt.comphuff", "r");
@@ -62,44 +68,65 @@ void boucle_alphabet() {
     printf("depasse: %d\nnb_chars: %d\n", depassement, nb_chars);
 
     /* on lit l'alphabet entier (il y a nb_chars caractères différents) */
-    for (i = 0; i < nb_chars; i++) {
-        /* on vide le buffer 1 à 1 */
-        for (i = 0; i < 8; i++) {
-            /* on ajoute le bit lu dans buffer_c à la fin de buffer_r*/
-            buffer_r[i_r] = buffer_c[i];
+    i = 0;
+    i_r = 0;
+    while (i < nb_chars) {
+        printf("---------- on lit un char -----------------------------------------------\n");
+        /* on lit 8 bits dans c */
+        if (fscanf(f, "%c", &c) != 1) printf("GERER ERREUR\n");
+        /* on convertit les 8 bits en un tableau de int (buffer_c) */
+        char2bin(c, buffer_c);
+
+        /*
+        printf("BUFFER_C: ");
+        for (j=0; j < 8; j++) printf("%d", buffer_c[j]);
+        printf("\n");
+        */
+        
+        /* on vide buffer_c 1 à 1 */
+        /* dbg("vidage buffer_c"); */
+        for (j = 0; j < 8; j++) {
+            /* on ajoute le bit lu dans buffer_c à la fin de buffer_r */
+            buffer_r[i_r] = buffer_c[j];
+            /* printf("vidage étape i_r = %d -> %d\n", i_r, buffer_r[i_r]); */
             i_r++;
 
-            /* puis on regarde ce qu'on veut lire */
+            /* puis on regarde ce qu'on veut lire, et on regarde si buffer_r est plein (8, 3 ou taille_code caractères) */
             lu = -1;
             switch (a_obtenir) {
             case CHAR:
                 /* si on doit lire un caractère */
                 if (i_r == 8) {
                     lu = bin2int(buffer_r, 8);
+                    printf("----------------------------- char lu: %c\n", lu);
                     i_r = 0; /* on revient au début du buffer */
                     a_obtenir = TAILLE;
                 }
                 break;
             case TAILLE:
-                /* si on doit lire un caractère */
+                /* si on doit lire la taille */
                 if (i_r == 3) {
-                    lu = bin2int(buffer_r, 3);
+                    lu = bin2int(buffer_r, 3) + 1; /* on a lu (taille_code - 1) dans le fichier compressé */
+                    taille_code = lu;
+                    printf("----------------------------- taille_code lue: %d\n", taille_code);
                     i_r = 0;
                     a_obtenir = CODE;
                 }
                 break;
             case CODE:
                 if (i_r == taille_code) {
+                    dbg("----------------------------- code lu");
                     lu = bin2int(buffer_r, taille_code);
                     i_r = 0;
                     a_obtenir = CHAR;
+                    i++; /* on a lu les données d'un caractère */
                 }
                 break;
             default: printf("wtf?\n"); break;
             }
 
             if (lu != -1) {
-                printf("lu: %d\n", lu);
+                printf("FINAL lu (a_obtenir: %d): %d\n", a_obtenir, lu);
             }
         }
     }
@@ -108,6 +135,7 @@ void boucle_alphabet() {
 int main() {
     int b_c[8];
 
+    /*
     char c = 'E';
 
     int i = 0;
@@ -117,7 +145,7 @@ int main() {
     printf("%c\n", c);
     for (i = 0; i < 8; i++) {
         printf("%d", b_c[i]);
-    }
+        }*/
 
     printf("\n");
     boucle_alphabet();

@@ -274,8 +274,10 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         if (alphabet[i] != NULL) {
             if (alphabet[i] -> codage != -1){
                 /* (char) */
+                printf("%c %d\n", alphabet[i]->c, alphabet[i]->codage);
                 buffer = ecrire_fich(comp, &it, buffer, i, 7); /* on écrit 8 bits */
                 /* (nb_bits) */
+                printf("%d \n", alphabet[i]->nb_bits);
                 taille = alphabet[i] -> nb_bits;
                 buffer = ecrire_fich(comp, &it, buffer, taille - 1, 2);  /* on écrit 3 bits */
                 /* (codage) */
@@ -289,7 +291,7 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
 
     /* écriture du contenu */
     /* parcours caractère par caractère du fichier à compresser */
-    it = 0;
+    /* it = 0; */
 
     while ((c = fgetc(fic)) != EOF){
         code = alphabet[(int)c] -> codage;

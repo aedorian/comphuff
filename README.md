@@ -11,6 +11,7 @@ A FAIRE
 
 PRESENTATION
 - démo et étude du taux de compression
+- taille - 1 pour encoder la taille
 
 # ENTETE
 (nb_char_differents)[(char)(nb_bits)(code)...]
@@ -25,8 +26,9 @@ code compressé des caractères du fichier
 	-> et recrée arbre petit à petit
 - nombre max de nb_bits possible?
 
-# Bugs
+# Bugs A RESOUDRE ALBOSUMENT
 - erreur avec mlv draw text
+- un seul caractère: encodé par rien!!!!!!
 
 # Notes
 
