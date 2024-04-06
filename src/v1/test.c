@@ -55,10 +55,6 @@ char * int2string(int n, int nb_bits) {
     return codage;
 }
 
-void dbg(char * s) {
-    printf("%s\n", s);
-}
-
 
 noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit) {
     if (bit == 0) {
@@ -121,53 +117,42 @@ noeud * boucle_decomp(FILE * f) {
         /* on convertit les 8 bits en un tableau de int (buffer_c) */
         char2bin(c, buffer_c);
 
-        /*
-        printf("BUFFER_C: ");
-        for (j=0; j < 8; j++) printf("%d", buffer_c[j]);
-        printf("\n");
-        */
-        
         /* on vide buffer_c 1 à 1 */
-        /* dbg("vidage buffer_c"); */
         for (j = 0; j < 8 && nb_chars_lus < nb_chars; j++) {
             /* on ajoute le bit lu dans buffer_c à la fin de buffer_r */
             buffer_r[i_r] = buffer_c[j];
-            /* printf("vidage étape i_r = %d -> %d\n", i_r, buffer_r[i_r]); */
             i_r++;
 
             /* puis on regarde ce qu'on veut lire, et on regarde si buffer_r est plein (8, 3 ou taille_code caractères) */
             lu = -1;
             switch (a_obtenir) {
             case CHAR:
-                /* si on doit lire un caractère */
+                /* si on doit lire un caractère (encodé sur 8 bits) */
                 if (i_r == 8) {
                     lu = bin2int(buffer_r, 8);
-                    printf("----------------------------- char lu: %c\n", lu);
                     char_lu = lu;
                     i_r = 0; /* on revient au début du buffer */
                     a_obtenir = TAILLE;
                 }
                 break;
             case TAILLE:
-                /* si on doit lire la taille */
+                /* si on doit lire la taille (encodée sur 3 bits) */
                 if (i_r == 3) {
                     lu = bin2int(buffer_r, 3) + 1; /* on a lu (taille_code - 1) dans le fichier compressé */
                     taille_code = lu;
-                    printf("----------------------------- taille_code lue: %d\n", taille_code);
                     i_r = 0;
                     a_obtenir = CODE;
                 }
                 break;
             case CODE:
+                /* si on doit lire un code (encodé sur taille_code bits, récupérée précédemment) */
                 if (i_r == taille_code) {
-                    dbg("----------------------------- code lu");
                     lu = bin2int(buffer_r, taille_code);
                     i_r = 0;
                     a_obtenir = CHAR;
                     
-                    /* on a lu les 3 données (char, taille code, code) d'un caractère */
+                    /* on a maintenant lu les 3 données (char, taille code, code) d'un caractère */
                     /* on peut créer un noeud dans alphabet */
-
                     alphabet[char_lu] = (noeud *) malloc (sizeof(noeud));
                     if (alphabet[char_lu] == NULL) {
                         fprintf(stderr, "Erreur boucle_entete: erreur d'allocation mémoire\n");
@@ -180,7 +165,7 @@ noeud * boucle_decomp(FILE * f) {
                     nb_chars_lus++;
                 }
                 break;
-            default: printf("wtf?\n"); break;
+            default: break;
             }
         }
     }
@@ -253,8 +238,6 @@ void inserer_arbre_aux(noeud * a, char c, char * code, int pos) {
         }
     }
 }
-
-
 
 /* insère une feuille c dans l'arbre de huffman avec son codage */
 void inserer_arbre(noeud * arbre_huffman, noeud * a) {
