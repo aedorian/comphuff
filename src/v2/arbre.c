@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <MLV/MLV_all.h>
 
-#include "arbre.h"
+#include "headers/arbre.h"
 
 void affiche_car(char c) {
     if (c == '\n') printf("\\n");

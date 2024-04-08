@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <string.h>
 #include <MLV/MLV_all.h>
 
-#include <stddef.h>
-
-#include "arbre.h"
+#include "headers/arbre.h"
+#include "headers/comp.h"
+#include "headers/utils.h"
 
 /* compte le nombre d'occurences de chaque caractère dans le fichier fic
    et place le résultat dans un tableau */
@@ -104,24 +102,6 @@ void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
     }
 }
 
-void debug_huffman(noeud * huff[], int taille) {
-    int i;
-
-    printf("---------------- début debug ---------------------------------------\n");
-
-    for (i = 0; i < taille; i++) {
-
-        /*
-        printf("%d : ", i);
-        if (huff[i] == NULL) printf("-\n");
-        else printf("%c (%d)\n", huff[i]->c, huff[i]->occurence);
-        */
-
-        afficher_arbre(huff[i]);
-    }
-
-    printf("---------------- fin debug ---------------------------------------\n");
-}
 
 /* 4.2.7 */
 void creer_noeud(noeud * tab[], int taille) {
@@ -229,11 +209,6 @@ char ecrire_fich(FILE * fic, int *it, char buffer, int code, int start){
     return buffer;
 }
 
-void dbg(char * s) {
-    printf("%s\n", s);
-}
-
-
 /* à modulariser */
 void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabet[256]){
     FILE * comp = NULL;
@@ -319,113 +294,4 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     fwrite(&depassement, sizeof(char), 1, comp);
     
     fclose(comp);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-void usage(char *s){
-    printf("Usage %s : <fichier>\n", s);
-}
-
-
-
-
-
-
-
-int main(int argc, char *argv[]) {
-
-    FILE * fic = NULL;
-    int tab[256]; /* nombre d'occurences de chaque caractère */
-    noeud * arbre_huffman[256]; /* pointeurs vers des noeuds */
-    int n_huffman; /* taille du tableau arbre_huffman = nombre de feuilles à l'origine = nombre de caractères */
-
-    int n;
-
-    int i; /* DEBUG */
-    
-    noeud * alphabet[256];
-
-    if (argc < 2){
-        usage(argv[0]);
-        exit(EXIT_FAILURE);
-    }
-
-    fic = fopen(argv[1], "r");
-    if (fic == NULL) {
-        fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier \"%s\"\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
-
-    initialiser_occurences(tab);
-    initialiser_arbre_huffman(arbre_huffman);
-
-    /* appel de la fonction occurence */
-    occurence(fic, tab);
-    
-    /* 4.2.5 */
-    n_huffman = creer_noeuds_caracteres(tab, arbre_huffman);
-
-    /* on affiche les occurences de chaque caractère (si il y a eu une occurence) */
-    afficher_occurences(arbre_huffman);
-
-    debug_huffman(arbre_huffman, n_huffman);
-
-    /* on crée l'arbre */
-    n = n_huffman;
-    while (n != 1) {
-
-        creer_noeud(arbre_huffman, 256);
-
-        n--;
-
-        debug_huffman(arbre_huffman, n_huffman);
-    }
-
-    printf("fin de création des noeuds\n");
-
-    /* trouver l'arbre final dans la structure */
-    n = 0;
-    while (arbre_huffman[n] == NULL) n++;
-    /* le premier pointeur est l'arbre final */
-    arbre_huffman[0] = arbre_huffman[n];
-    printf("arbre final trouvé\n");
-
-    /* initialisation du tableau de noeud * alphabet */
-    for (i = 0; i < 256; i++) {
-        alphabet[i] = NULL;
-    }
-
-    /* créer l'alphabet */
-    creer_code(arbre_huffman[0], 0, 0, alphabet);
-    printf("alphabet créé\n");
-
-    for (i=0; i < 256; i++) {
-        if (alphabet[i] != NULL) {
-            printf("%c\n", alphabet[i]->c);
-        }
-    }
-
-    /* créer le fichier compressé */
-    /* ATTENTION POUR ETENDRE LES OPTIONS */
-    printf("DEVRAIT AVOIR NB_CHAR = %d\n", n_huffman);
-    creer_compresse(argv[1], fic, n_huffman, alphabet);
-    printf("A FINI DE COMPRESSER\n");
-
-    /* on ferme le fichier */
-    fclose(fic);
-    
-    afficher_arbre_graphique(arbre_huffman[0]);
-
-    exit(EXIT_SUCCESS);
-
 }

@@ -6,10 +6,11 @@
 
 #include <stddef.h>
 
-#include "arbre.h"
+#include "headers/arbre.h"
 
 /* compte le nombre d'occurences de chaque caractère dans le fichier fic
    et place le résultat dans un tableau */
+/* sans fread(), problème? */
 void occurence(FILE *fic, int tab[256]) {
     char c;
     
@@ -326,21 +327,9 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
 
 
 
-
-
-
-
-
-
 void usage(char *s){
     printf("Usage %s : <fichier>\n", s);
 }
-
-
-
-
-
-
 
 int main(int argc, char *argv[]) {
 

@@ -2,8 +2,13 @@
 #include <stdlib.h>
 #include <MLV/MLV_all.h>
 
-#include "arbre.h"
+#include "headers/arbre.h"
+#include "headers/decomp.h"
+#include "headers/utils.h"
 
+/* permet d'avancer dans l'arbre de huffman avec un pointeur parcours sur un noeud */
+/* cette fonction écrit aussi dans le fichier? ou retourne le char lu? */
+/* ATENTSION */
 noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit) {
     
     parcours = (bit == 0) ? parcours->gauche : parcours->droit;
@@ -16,12 +21,8 @@ noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit) {
     return parcours;
 }
 
-
-
-/* void lire_fich(FILE * fic, int */
-
 /* cette fonction lit l'entête du fichier en paramètre */
-noeud * boucle_decomp(FILE * f) {
+noeud * creer_decompresse(FILE * f) {
     noeud * alphabet[256];
     
     /* à lire au début (des int) */
@@ -171,10 +172,10 @@ noeud * boucle_decomp(FILE * f) {
     return arbre_huffman;
 }
 
-
-void inserer_arbre_aux(noeud * a, char c, char * code, int pos) {
+/* insère une feuille c dans l'arbre de Huffman grâce à son codage */
+void inserer_arbre(noeud * a, char c, char * code, int pos) {
     if (code[pos] == '\0') {
-        /* si on est à la fin */
+        /* si on est à la fin: s'arrête et assigne le caractère à la feuille*/
         a->c = c;
     }
     else {
@@ -183,70 +184,36 @@ void inserer_arbre_aux(noeud * a, char c, char * code, int pos) {
             if (a->gauche == NULL) {
                 a->gauche = creer_noeud('.', NULL, NULL);
             }
-            inserer_arbre_aux(a->gauche, c, code, pos + 1);
+            inserer_arbre(a->gauche, c, code, pos + 1);
         }
         
         if (code[pos] == '1') { /* on doit aller à gauche */
             if (a->droit == NULL) {
                 a->droit = creer_noeud('.', NULL, NULL);
             }
-            inserer_arbre_aux(a->droit, c, code, pos + 1);
+            inserer_arbre(a->droit, c, code, pos + 1);
         }
     }
 }
 
-/* insère une feuille c dans l'arbre de huffman avec son codage */
-void inserer_arbre(noeud * arbre_huffman, noeud * a) {
-    char * chaine_code;
-    
-    /* générer la chaîne de caractères */
-    /* nécessaire de passer par une chaîne de caractères pour lire "à l'envers" */
-    chaine_code = int2string(a->codage, a->nb_bits);
-
-    printf("%s\n", chaine_code);
-
-    inserer_arbre_aux(arbre_huffman, a->c, chaine_code, 0);
-}
-
-
+/* crée l'arbre de Huffman à partir d'un alphabet */
 noeud * creer_huffman_inverse(noeud * alphabet[256]) {
     noeud * arbre_huffman;
+    char * chaine_code;
     int i;
 
     arbre_huffman = creer_noeud('.', NULL, NULL);
 
     for (i = 0; i < 256; i++) {
         if (alphabet[i] != NULL) {
-            printf("%c %d %d\n", alphabet[i]->c, alphabet[i]->codage, alphabet[i]->nb_bits);
-            
-            inserer_arbre(arbre_huffman, alphabet[i]);
+
+            /* générer la chaîne de caractères */
+            /* nécessaire de passer par une chaîne de caractères pour lire "à l'envers" */
+            chaine_code = int2string(alphabet[i]->codage, alphabet[i]->nb_bits);
+
+            inserer_arbre(arbre_huffman, alphabet[i]->c, chaine_code, 0);
         }
     }
 
     return arbre_huffman;
-}
-
-
-
-int main() {
-    FILE * f;
-
-    noeud * arbre_huffman;
-    
-    /* ouverture du fichier */
-    f = fopen("yungmane.txt.comphuff", "r");
-    if (f == NULL) {
-        printf("erreur d'ouverture du fichier\n");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("\n");
-    arbre_huffman = boucle_decomp(f);
-
-    afficher_arbre_graphique(arbre_huffman);
-
-    free(arbre_huffman);
-    arbre_huffman = NULL;
-
-    exit(EXIT_SUCCESS);
 }
