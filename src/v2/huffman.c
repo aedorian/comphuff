@@ -57,8 +57,6 @@ int main(int argc, char *argv[]) {
         /* on affiche les occurences de chaque caractère (si il y a eu une occurence) */
         afficher_occurences(arbre_huffman);
 
-        debug_huffman(arbre_huffman, n_huffman);
-
         /* on crée l'arbre */
         n = n_huffman;
         while (n != 1) {

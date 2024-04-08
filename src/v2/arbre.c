@@ -31,7 +31,7 @@ noeud * creer_feuille(int *tab, int index) {
     return n;
 }
 
-noeud * creer_noeud(char c, noeud * filsgauche, noeud * filsdroit) {
+noeud * creer_arbre(char c, noeud * filsgauche, noeud * filsdroit) {
   noeud * a;
   a = (noeud *) malloc (sizeof(noeud));
   if (a == NULL) {

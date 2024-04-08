@@ -12,6 +12,6 @@ int bin2int(int buffer_r[8], int taille);
 
 /* convertit n en une chaîne de nb_bits caractères ('0' ou '1') et retourne cette chaîne*/
 /* ex: si n = 2 et nb_bits = 3, renvoie "010" */
-char * int2string(int n, int nb_bits)
+char * int2string(int n, int nb_bits);
 
 #endif /* _UTILS_H_ */

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h> /* INT_MAX */
 #include <MLV/MLV_all.h>
 
 #include "headers/arbre.h"
@@ -175,17 +176,6 @@ void creer_code(noeud * element, int code, int profondeur, noeud * alphabet[256]
 }
 
 
-/* COMPRESSION.C */
-
-/* renvoie 2^x */
-int puiss_2(int x){
-    if (x == 0){
-        return 1;
-    }
-    return puiss_2(x - 1) * 2;
-}
-
-
 /* écrit dans le fichier fic, à l'aide du buffer */
 /* start doit être n - 1 */
 char ecrire_fich(FILE * fic, int *it, char buffer, int code, int start){
@@ -260,8 +250,6 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
             }
         }
     }
-
-    dbg("FINI ECRITURE ALPHABET");
 
     /* écriture du contenu */
     /* parcours caractère par caractère du fichier à compresser */
