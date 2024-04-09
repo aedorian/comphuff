@@ -7,8 +7,8 @@
 #include "headers/comp.h"
 #include "headers/utils.h"
 
-/* compte le nombre d'occurences de chaque caractère dans le fichier fic
-   et place le résultat dans un tableau */
+
+/* Compte le nombre d'occurences de chaque caractère dans le fichier fic et place le résultat dans un tableau. */
 void occurence(FILE *fic, int tab[256]) {
     char c;
     
@@ -18,7 +18,7 @@ void occurence(FILE *fic, int tab[256]) {
     }
 }
 
-/* initialise le nombre d'occurences de chaque caractère à 0 */
+/* Initialise le nombre d'occurences de chaque caractère à 0. */
 void initialiser_occurences(int tab[256]) {
     int i;
 
@@ -29,7 +29,7 @@ void initialiser_occurences(int tab[256]) {
 
 }
 
-/* initialise tous les pointeurs du tableau à NULL */
+/* Initialise tous les pointeurs du tableau arbre_huffman à NULL. */
 void initialiser_arbre_huffman(noeud * arbre_huffman[256]) {
     int i;
 
@@ -38,6 +38,7 @@ void initialiser_arbre_huffman(noeud * arbre_huffman[256]) {
     }
 }
 
+/* Affiche toute les occurences des caractères contenu dans le fichier. */
 void afficher_occurences(noeud * arbre_huffman[256]) {
     int i;
     char c;
@@ -56,7 +57,9 @@ void afficher_occurences(noeud * arbre_huffman[256]) {
     }
 }
 
-/* 4.2.4 crée une structure noeud pour chaque caractère contenu dans le fichier */
+/* 4.2.4 */
+/* Crée une structure noeud pour chaque caractère contenu dans le fichier.
+Retourne la taille du tableau. */
 int creer_noeuds_caracteres(int tab[256], noeud * arbre_huffman[256]) {
     int i;
     int i_huffman = 0; /* index dans arbre_huffman */
@@ -73,7 +76,7 @@ int creer_noeuds_caracteres(int tab[256], noeud * arbre_huffman[256]) {
 }
 
 /* 4.2.6 */
-/* place dans i1 et i2 les indices des deux noeuds aux occurences les plus petites (i1 <= i2) */
+/* Place dans i1 et i2 les indices des deux derniers noeuds aux occurences les plus petites (i1 <= i2). */
 void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
     int i;
     int min = INT_MAX;
@@ -105,6 +108,7 @@ void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
 
 
 /* 4.2.7 */
+/* ########### */
 void creer_noeud(noeud * tab[], int taille) {
     int i1, i2;
     noeud * new;
@@ -113,7 +117,7 @@ void creer_noeud(noeud * tab[], int taille) {
     
     printf("indice %d, indice %d\n", i1,  i2);
 
-    /* check i1 et i2 != -1 ? */
+    /* check i1 et i2 != -1 ?  ########  */
 
     /* création du nouveau noeud */
 
@@ -123,13 +127,12 @@ void creer_noeud(noeud * tab[], int taille) {
         exit(EXIT_FAILURE);
     }
 
-    /* TROUVER LA POSITION NULL LA PLUS PROCHE? */
+    /* TROUVER LA POSITION NULL LA PLUS PROCHE?  ######### */
 
-    /* pas sûr pour la définition des membres */
-    new->c = 0; /* ??? */
+    new->c = 0;
     new->occurence = tab[i1]->occurence + tab[i2]->occurence;
-    new->codage = 0; /* ??????? */
-    new->nb_bits = 0; /* pas encore défini */
+    new->codage = 0;
+    new->nb_bits = 0;
 
     new->gauche = tab[i1];
     new->droit = tab[i2];
@@ -139,12 +142,7 @@ void creer_noeud(noeud * tab[], int taille) {
 }
 
 
-
-
-
-
-
-
+/* Affiche le codage du caractère (int) en binaire. */
 void affichage_code(int nbr_bits, int codage){
     if (nbr_bits <= 0){
         return;
@@ -156,7 +154,7 @@ void affichage_code(int nbr_bits, int codage){
 }
 
 
-/* mettre 0 à code */
+/* Stocke dans la structure alphabet le codage des caractères. */
 void creer_code(noeud * element, int code, int profondeur, noeud * alphabet[256]){
     if (est_feuille(element)){
         element -> codage = code;
@@ -176,12 +174,13 @@ void creer_code(noeud * element, int code, int profondeur, noeud * alphabet[256]
 }
 
 
-/* écrit dans le fichier fic, à l'aide du buffer */
-/* start doit être n - 1 */
+/* Écrit dans le fichier fic, à l'aide du buffer. Renvoi le buffer qui sera probablement non vide. */
+/* Start doit être n - 1. */
 char ecrire_fich(FILE * fic, int *it, char buffer, int code, int start){
     int i;
     
     for (i = start; i >= 0; i--){
+        /* écriture seulement si le buffer est plein */
         if (*it == 8){
             *it = 0;
             /* écriture du buffer dans le fichier */
@@ -199,14 +198,15 @@ char ecrire_fich(FILE * fic, int *it, char buffer, int code, int start){
     return buffer;
 }
 
-/* à modulariser */
+/* Crée et écrit dans le fichier compresser avec l'extension .comphuff
+le fichier sera de la forme : dépacement, nombre de caractères différent, structure alphabet, contenu compressé. */
 void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabet[256]){
     FILE * comp = NULL;
     char nom_comp[89]; /* nom du fichier compressé ###### (taille max de nom_fichier : 80)*/
     char buffer, c, depassement; /* 1 char = 8 bits */
     int code, taille, it, i;
     
-    /* On se place au début du fichier à compresser */
+    /* on se place au début du fichier à compresser */
     rewind(fic);
 
     /* création du fichier à compresser */
@@ -277,7 +277,7 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
 
     /* écriture au début du fichier du dépacement */
     
-    rewind(comp);
+    rewind(comp);   /* Retour au début du fichier */
     printf("depassement: %d\n", depassement);
     fwrite(&depassement, sizeof(char), 1, comp);
     

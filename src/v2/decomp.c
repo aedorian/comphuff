@@ -6,9 +6,8 @@
 #include "headers/decomp.h"
 #include "headers/utils.h"
 
-/* permet d'avancer dans l'arbre de huffman avec un pointeur parcours sur un noeud */
-/* cette fonction écrit aussi dans le fichier? ou retourne le char lu? */
-/* ATENTSION */
+/* Permet d'avancer dans l'arbre de huffman avec un pointeur parcours sur un noeud.
+Retourne le noeud de parcours. */
 noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit) {
     
     parcours = (bit == 0) ? parcours->gauche : parcours->droit;
@@ -21,7 +20,8 @@ noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit) {
     return parcours;
 }
 
-/* cette fonction lit l'entête du fichier en paramètre */
+/* Permet de décompresser le fichier binaire f formaté : dépacement, nombre de caractères différents, structure alphabet, contenu compressé.
+Retourne l'abre de codage associé au fichier f compressé. */
 noeud * creer_decompresse(FILE * f) {
     noeud * alphabet[256];
     
@@ -53,8 +53,12 @@ noeud * creer_decompresse(FILE * f) {
     for (j = 0; j < 256; j++) alphabet[j] = NULL;
 
     /* on lit les deux premières valeurs (sur 8 bits) */
-    if (fscanf(f, "%c", &depassement) != 1) printf("ereeo");
-    if (fscanf(f, "%c", &nb_chars) != 1) printf("erore");
+    if (fscanf(f, "%c", &depassement) != 1) {
+        fprintf(stderr, "Erreur de lecture du dépacement\n");
+    }
+    if (fscanf(f, "%c", &nb_chars) != 1) {
+        fprintf(stderr, "Erreur de lecture du nombre de caractères différents\n");
+    }
 
     printf("depasse: %d\nnb_chars: %d\n", depassement, nb_chars);
 
@@ -64,7 +68,9 @@ noeud * creer_decompresse(FILE * f) {
     while (nb_chars_lus < nb_chars) {
         printf("---------- on lit un char -----------------------------------------------\n");
         /* on lit 8 bits dans c */
-        if (fscanf(f, "%c", &c) != 1) printf("GERER ERREUR\n");
+        if (fscanf(f, "%c", &c) != 1) {
+            fprintf(stderr, "Erreur de lecture de l'alphabet\n");
+        }
         /* on convertit les 8 bits en un tableau de int (buffer_c) */
         char2bin(c, buffer_c);
 
@@ -107,7 +113,7 @@ noeud * creer_decompresse(FILE * f) {
                     alphabet[char_lu] = (noeud *) malloc (sizeof(noeud));
                     if (alphabet[char_lu] == NULL) {
                         fprintf(stderr, "Erreur boucle_entete: erreur d'allocation mémoire\n");
-                        exit(EXIT_FAILURE);
+                        exit(EXIT_FAILURE);  /* EXIT ??? NULL ? */
                     }
                     alphabet[char_lu]->c = char_lu;
                     alphabet[char_lu]->codage = lu;
@@ -172,7 +178,7 @@ noeud * creer_decompresse(FILE * f) {
     return arbre_huffman;
 }
 
-/* insère une feuille c dans l'arbre de Huffman grâce à son codage */
+/* Insère une feuille c dans l'arbre de Huffman grâce à son codage. */
 void inserer_arbre(noeud * a, char c, char * code, int pos) {
     if (code[pos] == '\0') {
         /* si on est à la fin: s'arrête et assigne le caractère à la feuille*/
@@ -196,7 +202,8 @@ void inserer_arbre(noeud * a, char c, char * code, int pos) {
     }
 }
 
-/* crée l'arbre de Huffman à partir d'un alphabet */
+/* Crée l'arbre de Huffman à partir d'un alphabet,
+et le retourne. */
 noeud * creer_huffman_inverse(noeud * alphabet[256]) {
     noeud * arbre_huffman;
     char * chaine_code;

@@ -6,18 +6,20 @@
 #define TAILLE 1
 #define CODE 2
 
-/* permet d'avancer dans l'arbre de huffman avec un pointeur parcours sur un noeud */
-/* cette fonction écrit aussi dans le fichier? ou retourne le char lu? */
-/* ATENTSION */
+
+/* Permet d'avancer dans l'arbre de huffman avec un pointeur parcours sur un noeud.
+Retourne le noeud de parcours. */
 noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit);
 
-/* insère une feuille c dans l'arbre de Huffman grâce à son codage */
+/* Insère une feuille c dans l'arbre de Huffman grâce à son codage. */
 void inserer_arbre(noeud * a, char c, char * code, int pos);
 
-/* crée et retourne un arbre de Huffman à partir d'un alphabet */
+/* Crée l'arbre de Huffman à partir d'un alphabet,
+et le retourne. */
 noeud * creer_huffman_inverse(noeud * alphabet[256]);
 
-/* lit l'entête du fichier en paramètre, reconstruit l'arbre de huffman (et le renvoie) et écrit dans un fichier */
+/* Permet de décompresser le fichier binaire f formaté : dépacement, nombre de caractères différents, structure alphabet, contenu compressé.
+Retourne l'abre de codage associé au fichier f compressé. */
 noeud * creer_decompresse(FILE * f);
 
 #endif /* _DECOMP_H_ */

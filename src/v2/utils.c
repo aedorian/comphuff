@@ -4,14 +4,14 @@
 
 #include "headers/utils.h"
 
+
+/* Permet de calculer 2^x.
+Retourne le résultat. */
 int puiss_2(int x){
-    if (x == 0){
-        return 1;
-    }
-    return puiss_2(x - 1) * 2;
+    return 1 << x;
 }
 
-/* remplit buffer_c des chiffres du caractère en binaire */
+/* Remplit buffer_c des chiffres du caractère en binaire. */
 void char2bin(char c, int buffer_c[8]) {
     int i;
     for (i = 7; i >= 0; i--) {
@@ -20,7 +20,8 @@ void char2bin(char c, int buffer_c[8]) {
     }
 }
 
-/* convertit un buffer de int en un entier */
+/* Convertit un buffer de int (de taille : taille) en un entier,
+et le retourne. */
 int bin2int(int buffer_r[8], int taille) {
     int i;
     int res = 0;
@@ -33,11 +34,14 @@ int bin2int(int buffer_r[8], int taille) {
     return res;
 }
 
-/* convertit n en une chaîne de nb_bits caractères, en binaire */
+/* Convertit n en une chaîne de nb_bits caractères, en binaire,
+et le retourne. */
+/* ex: si n = 2 et nb_bits = 3, renvoie "010" */
 char * int2string(int n, int nb_bits) {
     char * codage;
     int i;
-    
+
+    /* nb_bits + 1 car c'est la taille - 1 du codage qui est stocké */
     codage = (char *) malloc ((nb_bits + 1) * sizeof(char));
 
     for (i = 0; i < nb_bits; i++) {

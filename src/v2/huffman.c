@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <string.h>
 #include <MLV/MLV_all.h>
-
 #include <stddef.h>
 
 #include "headers/arbre.h"
@@ -11,12 +9,38 @@
 #include "headers/decomp.h"
 
 
-void usage(char *s){
-    printf("Usage %s : <fichier>\n", s);
+/* Affiche la documentation du logiciel. */
+void afficher_doc(){
+    printf("Nom :\n\t./huffman : compression et décompression de fichier utilisant le codage de huffman\n\n");
+    printf("Utilisation :\n\t./huffman [OPTION] [FICHIER]...\n\n");
+    printf("Description :\n\tAffichage de cette documentation :\n\t\t./huffman -h\n\n");
+    printf("\tCompression de fichier(s) ou dossier(s) :\n\t\t./huffman -c nom_archive liste_fichiers_ou_dossiers_a_compresser\n\n");
+    printf("\tDécompression d'une archive .comphuff :\n\t\t./huffman -d archive.comphuff [dossier_cible]\n\n");
 }
 
 
-int main(int argc, char *argv[]) {
+/* Calcule la taille de s,
+Et la retourne. */
+int taille(char *s){
+    char *chaine = s;
+    int t = 0;
+
+    while (chaine[0] != '\0'){
+        t++;
+        chaine++;
+    }
+
+    return t;
+}
+
+
+/* Affiche un message d'erreur en cas de problème d'argument */
+void usage(char * s){
+    printf("Usage %s : pour plus de détails, utilisez l'option -h\n", s);
+}
+
+
+int main(int argc, char * argv[]) {
 
     FILE * fic = NULL;
     int tab[256]; /* nombre d'occurences de chaque caractère */
@@ -27,23 +51,31 @@ int main(int argc, char *argv[]) {
     int i;
     
     noeud * alphabet[256];
-
     
-
-    if (argc < 2){
+    
+    if ( (argc < 2) || (taille(argv[1]) != 2) || (argv[1][0] != '-') ) {
         usage(argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    fic = fopen(argv[1], "r");
-    if (fic == NULL) {
-        fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier \"%s\"\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
+    switch (argv[1][1]){
+    case 'c':
+        if (argc < 3){
+            fprintf(stderr, "Veuillez préciser un nom d'archive et une liste de fichiers ou dossiers à compresser\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        if (argc < 4) {
+            fprintf(stderr, "Veuillez préciser une liste de fichiers ou dossiers à compresser\n");
+            exit(EXIT_FAILURE);
+        }
 
-
-
-    if (1) { /* SI ON COMPRESSE */
+        /* compression */
+        fic = fopen(argv[2], "r");
+        if (fic == NULL) {
+            fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier \"%s\"\n", argv[1]);
+            exit(EXIT_FAILURE);
+        }
 
         initialiser_occurences(tab);
         initialiser_arbre_huffman(arbre_huffman);
@@ -87,12 +119,24 @@ int main(int argc, char *argv[]) {
         fclose(fic);
     
         afficher_arbre_graphique(arbre_huffman[0]);
+        
+        break;
+    case 'd':
+        if (argc < 3) {
+            fprintf(stderr, "Veuillez préciser une archive .comphuff à décompresser\n");
+            exit(EXIT_FAILURE);
+        }
 
+        /* decomp de argv[2] */
+        
+        break;
+    case 'h':
+        afficher_doc();
+        break;
+    default:
+        fprintf(stderr, "Erreur, option inconnu\n");
+        break;
     }
-    else {
-        /* SI ON DECOMPRESSE */
-    }
-
+    
     exit(EXIT_SUCCESS);
-
 }

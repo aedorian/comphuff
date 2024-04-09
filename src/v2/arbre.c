@@ -4,6 +4,8 @@
 
 #include "headers/arbre.h"
 
+
+/* Affiche les principaux caractères invisibles sous une forme visible. */
 void affiche_car(char c) {
     if (c == '\n') printf("\\n");
     else if (c == ' ') printf("espace");
@@ -11,6 +13,9 @@ void affiche_car(char c) {
     else printf("%c", c);
 }
 
+
+/* Alloue la mémoire pour une feuille.
+Retourne le nouveau noeud créé. */
 noeud * creer_feuille(int *tab, int index) {
     noeud * n;
     
@@ -31,6 +36,9 @@ noeud * creer_feuille(int *tab, int index) {
     return n;
 }
 
+
+/* Crée un nouvelle arbre, sont fils gauche sera filsgauche, sont fils droit sera filsdroit.
+Retourne le nouveau noeud créé. */
 noeud * creer_arbre(char c, noeud * filsgauche, noeud * filsdroit) {
   noeud * a;
   a = (noeud *) malloc (sizeof(noeud));
@@ -46,11 +54,15 @@ noeud * creer_arbre(char c, noeud * filsgauche, noeud * filsdroit) {
   return a;
 }
 
+
+/* Revoie 1 si n est une feuille, 0 sinon. */
 int est_feuille(noeud * n) {
     return (n->gauche == NULL && n->droit == NULL);
 }
 
-void afficher_arbre_aux(noeud * a, int profondeur, int droit) {
+
+/* Fonction récursive pour afficher l'arbre a sur un terminal. */
+static void afficher_arbre_aux(noeud * a, int profondeur, int droit) {
   int i;
   
   if (a != NULL) {
@@ -73,11 +85,15 @@ void afficher_arbre_aux(noeud * a, int profondeur, int droit) {
   }
 }
 
+
+/* Affiche l'abre a sur un terminal. */
 void afficher_arbre(noeud * a) {
   afficher_arbre_aux(a, 0, 0);
 }
 
-void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, int prev_y, int dec_x) {
+
+/* Fonction récursive pour afficher l'arbre a dans une fenêtre MLV. */
+static void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, int prev_y, int dec_x) {
   char aff[3];
   
   if (a != NULL) {
@@ -112,6 +128,8 @@ void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, i
   }
 }
 
+
+/* Affiche l'abre a dans une fenêtre MLV. */
 void afficher_arbre_graphique(noeud * a) {
   MLV_create_window("Arbre binaire", "keyboard events", WIDTH, HEIGHT);
 
