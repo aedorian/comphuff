@@ -52,3 +52,17 @@ char * int2string(int n, int nb_bits) {
 
     return codage;
 }
+
+/* Calcule la taille de s,
+Et la retourne. */
+int taille(char *s){
+    char *chaine = s;
+    int t = 0;
+
+    while (chaine[0] != '\0'){
+        t++;
+        chaine++;
+    }
+
+    return t;
+}

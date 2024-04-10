@@ -17,4 +17,8 @@ et le retourne. */
 /* ex: si n = 2 et nb_bits = 3, renvoie "010" */
 char * int2string(int n, int nb_bits);
 
+/* Calcule la taille de s,
+Et la retourne. */
+int taille(char *s);
+
 #endif /* _UTILS_H_ */

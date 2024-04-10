@@ -2,18 +2,21 @@
 #include <stdlib.h>
 #include <MLV/MLV_all.h>
 
+#include <string.h>
+
 #include "headers/arbre.h"
 #include "headers/decomp.h"
 #include "headers/utils.h"
 
 /* Permet d'avancer dans l'arbre de huffman avec un pointeur parcours sur un noeud.
+   S'occupe également d'écrire dans le fichier décompressé.
 Retourne le noeud de parcours. */
-noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit) {
+noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit, FILE * fic) {
     
     parcours = (bit == 0) ? parcours->gauche : parcours->droit;
     
     if (est_feuille(parcours)) {
-        printf("%c", parcours->c);
+        fprintf(fic, "%c", parcours->c);
         parcours = arbre_huffman; /* retour au début */
     }
 
@@ -22,7 +25,7 @@ noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit) {
 
 /* Permet de décompresser le fichier binaire f formaté : dépacement, nombre de caractères différents, structure alphabet, contenu compressé.
 Retourne l'abre de codage associé au fichier f compressé. */
-noeud * creer_decompresse(FILE * f) {
+noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) {
     noeud * alphabet[256];
     
     /* à lire au début (des int) */
@@ -40,10 +43,13 @@ noeud * creer_decompresse(FILE * f) {
     int buffer_r[8]; /* buffer de lecture */
     int i_r; /* position actuelle dans buffer_r */
     
-    int char_lu; /* le caractère en train d'être lu. aussi utilisé pour indexer alphabet */
+    int char_lu = 0; /* le caractère en train d'être lu. aussi utilisé pour indexer alphabet */
     int lu; /* OBSOLETE */
 
-    /* PARTIE HUFFMAN */
+    /* PARTIE ARBRE DE HUFFMAN */
+    FILE * fic_decomp = NULL; /* fichier décompressé */
+    char nom_decomp[100];
+    
     noeud * arbre_huffman;
     noeud * parcours;
     char c_next;
@@ -127,13 +133,31 @@ noeud * creer_decompresse(FILE * f) {
         }
     }
 
-
     /* FIN DE LECTURE DE L'ALPHABET */
-    /* on ne ferme pas le fichier, on l'utilisera plus tard */
+    /* on ne ferme pas le fichier, on l'utilisera plus tard pour lire le contenu du fichier */
     
     arbre_huffman = creer_huffman_inverse(alphabet);
 
+    printf("passe crerarbre\n");
+
     /* ECRITURE DU FICHIER */
+    /* création du nom du fichier décompressé */
+    printf("%s\n", nom_fichier);
+    if (chemin_dossier != NULL) {
+        strcpy(nom_decomp, chemin_dossier);
+        /* regarder si le '/' a déjà été inclus */
+        strcat(nom_decomp, nom_fichier);
+    }
+    else {
+        strcpy(nom_decomp, nom_fichier);
+    }
+    strcat(nom_decomp, ".decomp");
+    fic_decomp = fopen(nom_decomp, "w");
+    if (fic_decomp == NULL) {
+        fprintf(stderr, "Erreur main: erreur lors de l'ouverture de \"%s\"\n", nom_decomp);
+        exit(EXIT_FAILURE);
+    }
+    
     /* on commence au début */
     parcours = arbre_huffman;
     c_next = 0; /* prochain octet, initialisé à 0 pour NULL */
@@ -142,7 +166,7 @@ noeud * creer_decompresse(FILE * f) {
     /* finir de vider le buffer restant: le dernier char lu n'a peut-être pas été lu en entier */
     printf("restant: %d\n", j);
     while (j != 8 && j != 0) { /* j != 0 pas sûr sûr */
-        parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_c[j]);
+        parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_c[j], fic_decomp);
         j++;
     }
 
@@ -162,7 +186,7 @@ noeud * creer_decompresse(FILE * f) {
         char2bin(c, buffer_r);
 
         for (i_r = 0; i_r < 8; i_r++) {
-            parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_r[i_r]);
+            parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_r[i_r], fic_decomp);
         }
 
         /* on sait qu'il y a eu un prochain octet: c devient ce prochain octet */
@@ -172,8 +196,10 @@ noeud * creer_decompresse(FILE * f) {
     /* on est sur le dernier octet du fichier: il faut terminer la lecture sans le dépassement */
     char2bin(c, buffer_r);
     for (i_r = 0; i_r < 8 - depassement; i_r++) {
-        parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_r[i_r]);
+        parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_r[i_r], fic_decomp);
     }
+
+    fclose(fic_decomp);
 
     return arbre_huffman;
 }
@@ -188,14 +214,14 @@ void inserer_arbre(noeud * a, char c, char * code, int pos) {
         
         if (code[pos] == '0') { /* on doit aller à gauche */
             if (a->gauche == NULL) {
-                a->gauche = creer_noeud('.', NULL, NULL);
+                a->gauche = creer_arbre('.', NULL, NULL);
             }
             inserer_arbre(a->gauche, c, code, pos + 1);
         }
         
         if (code[pos] == '1') { /* on doit aller à gauche */
             if (a->droit == NULL) {
-                a->droit = creer_noeud('.', NULL, NULL);
+                a->droit = creer_arbre('.', NULL, NULL);
             }
             inserer_arbre(a->droit, c, code, pos + 1);
         }
@@ -209,10 +235,11 @@ noeud * creer_huffman_inverse(noeud * alphabet[256]) {
     char * chaine_code;
     int i;
 
-    arbre_huffman = creer_noeud('.', NULL, NULL);
+    arbre_huffman = creer_arbre('.', NULL, NULL); /* crée un noeud */
 
     for (i = 0; i < 256; i++) {
         if (alphabet[i] != NULL) {
+            printf("non nul\n");
 
             /* générer la chaîne de caractères */
             /* nécessaire de passer par une chaîne de caractères pour lire "à l'envers" */

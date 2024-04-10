@@ -1,9 +1,22 @@
 # Projet programmation impérative 3
 ## OUVERTURE BINAIRE DE LA BASE
 
-`xxd -b banane.txt.comphuff`
+# dernières updates
+- compression et décompression marchent
+- renommage de creer_noeud(car, filsgauche, filsdroit) en creer_arbre
+- correction de caractère tout seul marche pas
+- possible de décompresser dans un dossier
+# à faire
+- décompression dans un autre dossier: vérifier que le / est bien là ou pas
+- autres versions
+- v6: afficher_arbre_graphique dans le GUI
+- remettre static des aux dans arbre.h?
+# QUESTIONS
+- comment stocker nom du fichier/chemin? deux approches
 
-- reste juste à écrire dans un fichier (lire_bit_arbre retourne un char?)
+---
+
+`xxd -b banane.txt.comphuff`
 
 A FAIRE
 - code source + makefile

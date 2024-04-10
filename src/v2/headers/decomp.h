@@ -8,8 +8,9 @@
 
 
 /* Permet d'avancer dans l'arbre de huffman avec un pointeur parcours sur un noeud.
+   S'occupe également d'écrire dans le fichier décompressé.
 Retourne le noeud de parcours. */
-noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit);
+noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit, FILE * fic);
 
 /* Insère une feuille c dans l'arbre de Huffman grâce à son codage. */
 void inserer_arbre(noeud * a, char c, char * code, int pos);
@@ -20,6 +21,6 @@ noeud * creer_huffman_inverse(noeud * alphabet[256]);
 
 /* Permet de décompresser le fichier binaire f formaté : dépacement, nombre de caractères différents, structure alphabet, contenu compressé.
 Retourne l'abre de codage associé au fichier f compressé. */
-noeud * creer_decompresse(FILE * f);
+noeud * boucle_decompresse(FILE * f, char * nom_decomp, char * chemin_dossier);
 
 #endif /* _DECOMP_H_ */

@@ -37,4 +37,8 @@ char ecrire_fich(FILE * fic, int *it, char buffer, int code, int start);
 le fichier sera de la forme : dépacement, nombre de caractères différent, structure alphabet, contenu compressé. */
 void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabet[256]);
 
+/* boucle principale pour compresser un fichier et l'ajouter à la fin d'un nouveau fichier compressé */
+/* on suppose fic déjà ouvert */
+void boucle_compresse(FILE * fic, char * nom_fic);
+
 #endif /* _COMP_H_ */

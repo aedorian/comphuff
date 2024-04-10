@@ -7,6 +7,7 @@
 #include "headers/arbre.h"
 #include "headers/comp.h"
 #include "headers/decomp.h"
+#include "headers/utils.h" /* pour taille */
 
 
 /* Affiche la documentation du logiciel. */
@@ -19,21 +20,6 @@ void afficher_doc(){
 }
 
 
-/* Calcule la taille de s,
-Et la retourne. */
-int taille(char *s){
-    char *chaine = s;
-    int t = 0;
-
-    while (chaine[0] != '\0'){
-        t++;
-        chaine++;
-    }
-
-    return t;
-}
-
-
 /* Affiche un message d'erreur en cas de problème d'argument */
 void usage(char * s){
     printf("Usage %s : pour plus de détails, utilisez l'option -h\n", s);
@@ -43,14 +29,7 @@ void usage(char * s){
 int main(int argc, char * argv[]) {
 
     FILE * fic = NULL;
-    int tab[256]; /* nombre d'occurences de chaque caractère */
-    noeud * arbre_huffman[256]; /* pointeurs vers des noeuds */
-    int n_huffman; /* taille du tableau arbre_huffman = nombre de feuilles à l'origine = nombre de caractères */
-
-    int n;
-    int i;
-    
-    noeud * alphabet[256];
+    char * chemin_dossier = NULL;
     
     
     if ( (argc < 2) || (taille(argv[1]) != 2) || (argv[1][0] != '-') ) {
@@ -61,64 +40,30 @@ int main(int argc, char * argv[]) {
     switch (argv[1][1]){
     case 'c':
         if (argc < 3){
-            fprintf(stderr, "Veuillez préciser un nom d'archive et une liste de fichiers ou dossiers à compresser\n");
+            fprintf(stderr, "Veuillez préciser un nom d'archive et un fichier à compresser\n");
             exit(EXIT_FAILURE);
         }
-        
+
         if (argc < 4) {
-            fprintf(stderr, "Veuillez préciser une liste de fichiers ou dossiers à compresser\n");
+            fprintf(stderr, "Veuillez préciser un fichier à compresser\n");
             exit(EXIT_FAILURE);
         }
 
         /* compression */
-        fic = fopen(argv[2], "r");
+
+        /* ouverture du fichier à compresser */
+        fic = fopen(argv[3], "r");
         if (fic == NULL) {
-            fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier \"%s\"\n", argv[1]);
+            fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier \"%s\"\n", argv[3]);
             exit(EXIT_FAILURE);
         }
 
-        initialiser_occurences(tab);
-        initialiser_arbre_huffman(arbre_huffman);
-
-        /* appel de la fonction occurence */
-        occurence(fic, tab);
-    
-        /* 4.2.5 */
-        n_huffman = creer_noeuds_caracteres(tab, arbre_huffman);
-
-        /* on affiche les occurences de chaque caractère (si il y a eu une occurence) */
-        afficher_occurences(arbre_huffman);
-
-        /* on crée l'arbre */
-        n = n_huffman;
-        while (n != 1) {
-            creer_noeud(arbre_huffman, 256);
-            n--;
-            /* debug_huffman(arbre_huffman, n_huffman); */
-        }
-
-        /* trouver l'arbre final dans la structure */
-        n = 0;
-        while (arbre_huffman[n] == NULL) n++;
-        /* le premier pointeur (index 0) est l'arbre final */
-        arbre_huffman[0] = arbre_huffman[n];
-
-        /* initialisation du tableau de noeud * alphabet */
-        for (i = 0; i < 256; i++) {
-            alphabet[i] = NULL;
-        }
-
-        /* créer l'alphabet */
-        creer_code(arbre_huffman[0], 0, 0, alphabet);
-
-        /* créer le fichier compressé */
-        /* ATTENTION POUR ETENDRE LES OPTIONS */
-        creer_compresse(argv[1], fic, n_huffman, alphabet);
+        boucle_compresse(fic, argv[2]); /* argv[1] = nom du fichier */
     
         /* on ferme le fichier */
         fclose(fic);
     
-        afficher_arbre_graphique(arbre_huffman[0]);
+        /* afficher_arbre_graphique(arbre_huffman[0]); */
         
         break;
     case 'd':
@@ -127,7 +72,23 @@ int main(int argc, char * argv[]) {
             exit(EXIT_FAILURE);
         }
 
+        /* ouverture du fichier à décompresser */
+        fic = fopen(argv[2], "r");
+        if (fic == NULL) {
+            fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier \"%s\"\n", argv[2]);
+            exit(EXIT_FAILURE);
+        }
+
         /* decomp de argv[2] */
+        /* récupération du chemin du répertoire dans lequel décompresser (si il existe) */
+        if (argc >= 4) {
+            chemin_dossier = argv[3];
+        }
+        boucle_decompresse(fic, argv[2], chemin_dossier);
+
+        /* on ferme le fichier */
+        fclose(fic);
+        
         
         break;
     case 'h':

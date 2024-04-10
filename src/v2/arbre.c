@@ -62,7 +62,7 @@ int est_feuille(noeud * n) {
 
 
 /* Fonction récursive pour afficher l'arbre a sur un terminal. */
-static void afficher_arbre_aux(noeud * a, int profondeur, int droit) {
+void afficher_arbre_aux(noeud * a, int profondeur, int droit) {
   int i;
   
   if (a != NULL) {
@@ -93,7 +93,7 @@ void afficher_arbre(noeud * a) {
 
 
 /* Fonction récursive pour afficher l'arbre a dans une fenêtre MLV. */
-static void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, int prev_y, int dec_x) {
+void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, int prev_y, int dec_x) {
   char aff[3];
   
   if (a != NULL) {

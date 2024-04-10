@@ -130,15 +130,23 @@ void creer_noeud(noeud * tab[], int taille) {
     /* TROUVER LA POSITION NULL LA PLUS PROCHE?  ######### */
 
     new->c = 0;
-    new->occurence = tab[i1]->occurence + tab[i2]->occurence;
+    /* on vérifie si on a pu trouver un deuxième noeud plus petit (gestion du cas à un seul caractère) */
+    if (i2 == -1) {
+        new->occurence = tab[i1]->occurence;
+    }
+    else {
+        new->occurence = tab[i1]->occurence + tab[i2]->occurence;
+    }
     new->codage = 0;
     new->nb_bits = 0;
 
     new->gauche = tab[i1];
-    new->droit = tab[i2];
+    new->droit = (i2 != -1) ? tab[i2] : NULL;
 
     tab[i1] = new;
-    tab[i2] = NULL;
+    if (i2 != -1) {
+        tab[i2] = NULL;
+    }
 }
 
 
@@ -156,20 +164,22 @@ void affichage_code(int nbr_bits, int codage){
 
 /* Stocke dans la structure alphabet le codage des caractères. */
 void creer_code(noeud * element, int code, int profondeur, noeud * alphabet[256]){
-    if (est_feuille(element)){
-        element -> codage = code;
-        element -> nb_bits = profondeur;
-        /* rajouté */
+    if (element != NULL) {
+        if (est_feuille(element)){
+            element -> codage = code;
+            element -> nb_bits = profondeur;
+            /* rajouté */
         
-        affichage_code(profondeur, code);
-        printf("(%c)-", element->c);
-        /* stockage dans la structure alphabet */
-        alphabet[(int)element -> c] = element;
-        printf("%c\n", alphabet[(int) element -> c]->c);
-    }
-    else {
-        creer_code(element -> gauche, code * 2, profondeur + 1, alphabet);
-        creer_code(element -> droit, code * 2 + 1, profondeur + 1, alphabet);
+            affichage_code(profondeur, code);
+            printf("(%c)-", element->c);
+            /* stockage dans la structure alphabet */
+            alphabet[(int)element -> c] = element;
+            printf("%c\n", alphabet[(int) element -> c]->c);
+        }
+        else {
+            creer_code(element -> gauche, code * 2, profondeur + 1, alphabet);
+            creer_code(element -> droit, code * 2 + 1, profondeur + 1, alphabet);
+        }
     }
 }
 
@@ -282,4 +292,56 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     fwrite(&depassement, sizeof(char), 1, comp);
     
     fclose(comp);
+}
+
+/* boucle principale pour compresser un fichier et l'ajouter à la fin d'un nouveau fichier compressé */
+/* on suppose fic déjà ouvert */
+void boucle_compresse(FILE * fic, char * nom_fic) {
+    int tab[256]; /* nombre d'occurences de chaque caractère */
+    noeud * arbre_huffman[256]; /* pointeurs vers des noeuds */
+    int n_huffman; /* taille du tableau arbre_huffman = nombre de feuilles à l'origine = nombre de caractères différents dans le fichier */
+
+    int n;
+    int i;
+    
+    noeud * alphabet[256];
+
+    initialiser_occurences(tab);
+    initialiser_arbre_huffman(arbre_huffman);
+
+    /* appel de la fonction occurence */
+    occurence(fic, tab);
+    
+    /* on obtient le nombre de caractères différents et on crée des noeuds pour chaque caractère */
+    n_huffman = creer_noeuds_caracteres(tab, arbre_huffman);
+
+    /* on affiche les occurences de chaque caractère (si il y a eu une occurence) */
+    /* afficher_occurences(arbre_huffman); */
+    
+    /* on crée l'arbre */
+    n = n_huffman;
+    do {
+        creer_noeud(arbre_huffman, 256);
+        n--;
+        /* debug_huffman(arbre_huffman, n_huffman); */
+    } while (n > 1); /* do while pour empêcher une erreur si il n'y a qu'un seul caractère */
+    
+    /* trouver l'arbre final dans la structure */
+    n = 0;
+    while (arbre_huffman[n] == NULL) n++;
+    /* le premier pointeur (index 0) est l'arbre final */
+    arbre_huffman[0] = arbre_huffman[n];
+
+    /* initialisation du tableau de noeud * alphabet */
+    for (i = 0; i < 256; i++) {
+        alphabet[i] = NULL;
+    }
+    /* créer l'alphabet */
+    creer_code(arbre_huffman[0], 0, 0, alphabet);
+
+    /* créer le fichier compressé */
+    /* ATTENTION POUR ETENDRE LES OPTIONS */
+    creer_compresse(nom_fic, fic, n_huffman, alphabet);
+
+    afficher_arbre_graphique(arbre_huffman[0]);
 }

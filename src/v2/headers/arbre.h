@@ -31,7 +31,7 @@ noeud * creer_arbre(char c, noeud * filsgauche, noeud * filsdroit);
 int est_feuille(noeud * n);
 
 /* Fonction récursive pour afficher l'arbre a sur un terminal. */
-static void afficher_arbre_aux(noeud * a, int profondeur, int droit);
+void afficher_arbre_aux(noeud * a, int profondeur, int droit);
 
 /* Affiche l'abre a sur un terminal. */
 void afficher_arbre(noeud * a);
@@ -43,6 +43,6 @@ void affiche_car(char c);
 void afficher_arbre_graphique(noeud * a);
 
 /* Fonction récursive pour afficher l'arbre a dans une fenêtre MLV. */
-static void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, int prev_y, int dec_x);
+void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, int prev_y, int dec_x);
 
 #endif /* _ARBRE_H_ */
