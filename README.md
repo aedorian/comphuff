@@ -12,7 +12,7 @@
 - v6: afficher_arbre_graphique dans le GUI
 - remettre static des aux dans arbre.h?
 # QUESTIONS
-- comment stocker nom du fichier/chemin? deux approches
+- comment stocker nom du fichier/chemin? deux approches (mp prof?)
 
 ---
 
