@@ -9,7 +9,6 @@
 - fonctions au début de huff_v2.c pour les prochaines versions, pour obtenir les noms des fichiers et tout (pour le moment ça les liste juste)
 
 # à faire
-- décompression dans un autre dossier: vérifier que le / est bien là ou pas
 - autres versions
 - v6: afficher_arbre_graphique dans le GUI
 - remettre static des aux dans arbre.h?
