@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <MLV/MLV_all.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "headers/utils.h"
 
 
@@ -65,4 +69,16 @@ int taille(char *s){
     }
 
     return t;
+}
+
+/* vérifie si le fichier est un dossier ou un fichier "normal" */
+/* 1 si c'est un fichier normal, 0 si ce n'est pas un fichier normal (donc un dossier dans notre cas) */
+/* renvoie aussi -1 si le fichier ou dossier n'existe pas */
+int est_fichier(char * chemin) {
+    struct stat chemin_stat;
+    if (stat(chemin, &chemin_stat)) {
+        /* printf("est_fichier(): erreur de la fonction stat()\n"); */
+        return -1;
+    }
+    return S_ISREG(chemin_stat.st_mode);
 }

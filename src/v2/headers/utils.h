@@ -21,4 +21,8 @@ char * int2string(int n, int nb_bits);
 Et la retourne. */
 int taille(char *s);
 
+/* vérifie si le fichier est un dossier ou un fichier "normal" */
+/* 1 si c'est un fichier normal, 0 si ce n'est pas un fichier normal (donc un dossier dans notre cas) */
+int est_fichier(char * chemin);
+
 #endif /* _UTILS_H_ */
