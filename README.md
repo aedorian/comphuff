@@ -5,7 +5,7 @@
 - makefile pour toutes les versions
 - début v1 et v2
 - fonction pour vérifier si fichier est fichier ou dossier `https://stackoverflow.com/questions/4553012/checking-if-a-file-is-a-directory-or-just-a-file` dans utils.c
-  - possible de tester version v2 (liste fichiers) avec `huff_v2 -c arfchieve fichiers/ eoeoele test.c`
+  - possible de tester version 5 (ou alors décommenter les lignes)
 - fonctions au début de huff_v2.c pour les prochaines versions, pour obtenir les noms des fichiers et tout (pour le moment ça les liste juste)
 
 # à faire
