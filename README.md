@@ -1,14 +1,14 @@
 # Projet programmation impérative 3
 ## OUVERTURE BINAIRE DE LA BASE
 
+---
+
 # A FAIRE (UPDATE)
 - j'ai fait deux fonctions pour compiler dans un fichier et pour reconstruire l'arborescence
   - bugs au niveau de getline? noms de fichier bizarre (`'t2'$'\n'` au lieu de `t2`)
   - s'arrête quand on ne peut plus rien lire ("erreur lors de la lecture du fichier")
 - il y a un exemple de fichier compilé (non compressé) dans `tmp.tmpcomp` (ouvre le avec emacs pour voir les caractères spéciaux)
 - j'ai testé de compresser de l'unicode (VOIR la section **DEUX TRUCS SPECIAUX**)
-
----
 
 à chaque ouverture, check si fichier existe (fonction (déléguer à tom))
 chaque version s'utilise avec chaque version (compressé de v1 peut pas être décomp avec v2)
@@ -33,7 +33,7 @@ B. SANS FICHIER TEMPORAIRE, REECRIRE COMPRESSION ET DECOMPRESSION ET GET ALPHABE
 
 
 # **DEUX TRUCS SPECIAUX**
--refuser de décompresser si pas .comphuff?
+- refuser de décompresser si pas .comphuff?
 
 - BIZARRE: SEGFAULT SUR SALMAN.TXT (caractère bizarre) -> ok j'ai testé NORMAL MAIS SEGFAULT SI UNICODE (vérif avant?)
 
