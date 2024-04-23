@@ -25,4 +25,7 @@ int taille(char *s);
 /* 1 si c'est un fichier normal, 0 si ce n'est pas un fichier normal (donc un dossier dans notre cas) */
 int est_fichier(char * chemin);
 
+/* renvoie le nom du fichier (sans le chemin) */
+char * nom_fich_base(char * chemin);
+
 #endif /* _UTILS_H_ */

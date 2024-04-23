@@ -224,7 +224,7 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     strcat(nom_comp, ".comphuff");
     
     comp = fopen(nom_comp, "wb");
-    if (fic == NULL) {
+    if (comp == NULL) {
         fprintf(stderr, "Erreur main: erreur lors de l'ouverture du fichier \"%s\"\n", nom_fichier);
         exit(EXIT_FAILURE);
     }
@@ -261,15 +261,20 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         }
     }
 
+    printf("fin écriture alphabet\n");
+
     /* écriture du contenu */
     /* parcours caractère par caractère du fichier à compresser */
     /* it = 0; */
 
     while ((c = fgetc(fic)) != EOF){
+        printf("on lit u nchar\n");
         code = alphabet[(int)c] -> codage;
         taille = alphabet[(int)c] -> nb_bits;
         buffer = ecrire_fich(comp, &it, buffer, code, taille - 1);
     }
+
+    printf("fin lecture fich\n");
 
     /* décalage suplémentaire et écriture du reste */
     i = it;

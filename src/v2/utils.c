@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #include "headers/utils.h"
 
@@ -81,4 +82,8 @@ int est_fichier(char * chemin) {
         return -1;
     }
     return S_ISREG(chemin_stat.st_mode);
+}
+
+char * nom_fich_base(char * chemin) {
+    return basename(chemin);
 }

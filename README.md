@@ -1,14 +1,45 @@
 # Projet programmation impérative 3
 ## OUVERTURE BINAIRE DE LA BASE
 
-# AJOUTE DEPUIS
-- makefile pour toutes les versions
-- début v1 et v2
-- fonction pour vérifier si fichier est fichier ou dossier `https://stackoverflow.com/questions/4553012/checking-if-a-file-is-a-directory-or-just-a-file` dans utils.c
-  - possible de tester version 5 (ou alors décommenter les lignes)
-- fonctions au début de huff_v2.c pour les prochaines versions, pour obtenir les noms des fichiers et tout (pour le moment ça les liste juste)
+# A FAIRE (UPDATE)
+- j'ai fait deux fonctions pour compiler dans un fichier et pour reconstruire l'arborescence
+  - bugs au niveau de getline? noms de fichier bizarre (`'t2'$'\n'` au lieu de `t2`)
+  - s'arrête quand on ne peut plus rien lire ("erreur lors de la lecture du fichier")
+- il y a un exemple de fichier compilé (non compressé) dans `tmp.tmpcomp` (ouvre le avec emacs pour voir les caractères spéciaux)
+- j'ai testé de compresser de l'unicode (VOIR la section **DEUX TRUCS SPECIAUX**)
 
-# à faire
+---
+
+à chaque ouverture, check si fichier existe (fonction (déléguer à tom))
+chaque version s'utilise avec chaque version (compressé de v1 peut pas être décomp avec v2)
+
+
+
+1. un seul fichier texte
+
+2. plusieurs fichiers (en liste) - ou un seul fichier
+
+3. fichiers sont dans un dossier (check si il n'y a pas de sous dossiers?)
+	-> décompression: dossier doit être recréé et fichiers décompressés dedans
+	
+4. dossier qui doit contenir fichiers texte et dossiers ayant eux-même des fichiers texte
+
+5. liste de dossiers et fichiers
+
+
+
+A. FICHIER TEMPORAIRE, JUSTE UN PEU PLUS POUR RECONSTITUER A FIN DE DECOMPRESSION
+B. SANS FICHIER TEMPORAIRE, REECRIRE COMPRESSION ET DECOMPRESSION ET GET ALPHABET
+
+
+# **DEUX TRUCS SPECIAUX**
+-refuser de décompresser si pas .comphuff?
+
+- BIZARRE: SEGFAULT SUR SALMAN.TXT (caractère bizarre) -> ok j'ai testé NORMAL MAIS SEGFAULT SI UNICODE (vérif avant?)
+
+---
+
+
 - autres versions
 - v6: afficher_arbre_graphique dans le GUI
 - remettre static des aux dans arbre.h?
@@ -26,8 +57,21 @@ A FAIRE
 - versions.txt (description)
 
 PRESENTATION
+- regarder notre entête
 - démo et étude du taux de compression
 - taille - 1 pour encoder la taille
+- table de correspondance pour noms de dossiers (quand profondeur grande)
+# TESTS A FAIRE (x,y)
+-> mettre la variance à chaque fois dans le CSV
+- TAILLE (caractères entièrement aléatoires)
+  - courbe 1 (non compressé): (x) taille du fichier, (y) taille du fichier
+  - courbe 2 (compressé): (x) taille originale, (y) taille compressée
+- FREQUENCE CARACTERES (taille donnée)
+- NOMBRE DE CARACTERES DIFFERENTS (taille et fréquence donnée)
+- DOSSIERS: nb_fichiers, sous-dossiers/profondeur dossiers
+1-100000 (logarithmique)
+10 ou 20 tirages pour une taille
+
 
 # ENTETE
 (nb_char_differents)[(char)(nb_bits)(code)...]
