@@ -4,10 +4,18 @@
 ---
 
 # A FAIRE (UPDATE)
+
+# DERNIERS PROBLEMES
+(ecrire chemin comme basename
+boucle séparée pour lire dans les fichiers ou fonction même nom mais différente de version à version)
+toujours bugs au niveau de getline
+FAIRE DOSSIERS SI EXISTENT PAS? DANS V3 ET PLUS
+
+TESTER SI DECOMPRESSION DANS UN DOSSIER MARCHE BIEN A CHAQUE FOIS
+
 - j'ai fait deux fonctions pour compiler dans un fichier et pour reconstruire l'arborescence
   - bugs au niveau de getline? noms de fichier bizarre (`'t2'$'\n'` au lieu de `t2`)
   - s'arrête quand on ne peut plus rien lire ("erreur lors de la lecture du fichier")
-- il y a un exemple de fichier compilé (non compressé) dans `tmp.tmpcomp` (ouvre le avec emacs pour voir les caractères spéciaux)
 - j'ai testé de compresser de l'unicode (VOIR la section **DEUX TRUCS SPECIAUX**)
 
 à chaque ouverture, check si fichier existe (fonction (déléguer à tom))
@@ -34,9 +42,6 @@ B. SANS FICHIER TEMPORAIRE, REECRIRE COMPRESSION ET DECOMPRESSION ET GET ALPHABE
 
 # **DEUX TRUCS SPECIAUX**
 - refuser de décompresser si pas .comphuff?
-
-- BIZARRE: SEGFAULT SUR SALMAN.TXT (caractère bizarre) -> ok j'ai testé NORMAL MAIS SEGFAULT SI UNICODE (vérif avant?)
-
 ---
 
 

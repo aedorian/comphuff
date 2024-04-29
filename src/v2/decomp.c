@@ -12,13 +12,16 @@
    S'occupe également d'écrire dans le fichier décompressé.
 Retourne le noeud de parcours. */
 noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit, FILE * fic) {
-    
+
+    printf("call lire_bit_arbre, bit=%d\n", bit);
     parcours = (bit == 0) ? parcours->gauche : parcours->droit;
     
     if (est_feuille(parcours)) {
         fprintf(fic, "%c", parcours->c);
         parcours = arbre_huffman; /* retour au début */
     }
+
+    printf("call good\n");
 
     return parcours;
 }
@@ -72,7 +75,7 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     nb_chars_lus = 0;
     i_r = 0;
     while (nb_chars_lus < nb_chars) {
-        printf("---------- on lit un char -----------------------------------------------\n");
+        printf("---------- on lit un char -----> ");
         /* on lit 8 bits dans c */
         if (fscanf(f, "%c", &c) != 1) {
             fprintf(stderr, "Erreur de lecture de l'alphabet\n");
@@ -124,6 +127,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
                     alphabet[char_lu]->c = char_lu;
                     alphabet[char_lu]->codage = lu;
                     alphabet[char_lu]->nb_bits = taille_code;
+
+                    printf("%c\n", char_lu);
                     
                     nb_chars_lus++;
                 }
@@ -157,6 +162,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         fprintf(stderr, "Erreur main: erreur lors de l'ouverture de \"%s\"\n", nom_decomp);
         exit(EXIT_FAILURE);
     }
+
+    /* afficher_arbre_graphique(arbre_huffman); */
     
     /* on commence au début */
     parcours = arbre_huffman;
@@ -165,12 +172,15 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
 
     /* finir de vider le buffer restant: le dernier char lu n'a peut-être pas été lu en entier */
     printf("restant: %d\n", j);
+    printf("buffer c = %c", c);
     while (j != 8 && j != 0) { /* j != 0 pas sûr sûr */
+        printf("debut etape, j=%d\n", j);
         parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_c[j], fic_decomp);
         j++;
     }
 
     /* si il y a encore des octets à lire */
+    printf("on regarde les derniers octets\n");
 
     /* si on lit un octet, on boucle. sinon pas de boucle */
     if (fscanf(f, "%c", &c_next) == 1) loop = 1; else loop = 0;
@@ -185,6 +195,11 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         
         char2bin(c, buffer_r);
 
+        printf("debut boucle i_r avec buffer_r = ");
+        for (i_r = 0; i_r < 8; i_r++) {
+            printf("%d", buffer_r[i_r]);
+        }printf("\n");
+        
         for (i_r = 0; i_r < 8; i_r++) {
             parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_r[i_r], fic_decomp);
         }
@@ -193,6 +208,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         c = c_next;
     }
 
+    printf("DERNIER OCTET DU FICHIER\n");
+
     /* on est sur le dernier octet du fichier: il faut terminer la lecture sans le dépassement */
     char2bin(c, buffer_r);
     for (i_r = 0; i_r < 8 - depassement; i_r++) {
@@ -200,6 +217,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     }
 
     fclose(fic_decomp);
+
+    printf("YOUPI MARCHE\n");
 
     return arbre_huffman;
 }
@@ -239,7 +258,7 @@ noeud * creer_huffman_inverse(noeud * alphabet[256]) {
 
     for (i = 0; i < 256; i++) {
         if (alphabet[i] != NULL) {
-            printf("non nul\n");
+            printf("non nul, char: %c\n", alphabet[i]->c);
 
             /* générer la chaîne de caractères */
             /* nécessaire de passer par une chaîne de caractères pour lire "à l'envers" */

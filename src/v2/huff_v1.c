@@ -58,7 +58,7 @@ int main(int argc, char * argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        boucle_compresse(fic, argv[2]); /* argv[1] = nom du fichier */
+        boucle_compresse(fic, argv[2]); /* argv[2] = nom du fichier */
     
         /* on ferme le fichier */
         fclose(fic);

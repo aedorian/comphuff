@@ -242,13 +242,14 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     fwrite(&c, sizeof(char), 1, comp);
 
     /* écriture de la structure alphabet : [(char)(nb_bits)(codage)] * nb_char */
+    printf("ECTIRUE DE L4ALPHABET:\n");
     buffer = 0;
     it = 0;
     for (i = 0; i < 256; i++){
         if (alphabet[i] != NULL) {
             if (alphabet[i] -> codage != -1){
                 /* (char) */
-                printf("%c %d\n", alphabet[i]->c, alphabet[i]->codage);
+                printf("%c %d ", alphabet[i]->c, alphabet[i]->codage);
                 buffer = ecrire_fich(comp, &it, buffer, i, 7); /* on écrit 8 bits */
                 /* (nb_bits) */
                 printf("%d \n", alphabet[i]->nb_bits);
