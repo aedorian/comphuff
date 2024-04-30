@@ -23,7 +23,8 @@ void gen_fich(int nb_car, int nb_car_diff, int graine, char * nom){
     srand(graine);
     
     for (i = 0; i < nb_car; i++){
-        fputc(rand() % nb_car_diff, fic);
+        /* écrit les caractère dans l'interval [255; 255 - nb_car_diff] */
+        fputc(255 - (rand() % nb_car_diff), fic);
     }
 
     printf("Fichier généré\n");
