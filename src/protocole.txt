@@ -40,4 +40,4 @@ Test en fonction de la profondeur des dossiers :
 param fix : pas de fichier dans les dossiers
 profondeur : 0 correspond a la compression d'un dossier dans le répertoire courant, 1 correspond a la compression de 2 dossier, le deuxième est dans le premier, lui même dans le dossier courant, etc.
 profondeur : 0, 1, 2, 5, 10, 20, 50
-résultat attendu : compression de moins en moins efficace
+résultat attendu : compression de moins en moins efficace (parce qu'on a inclus le nom des répertoires, donc il y a de plus en plus de caractères à compresser)
