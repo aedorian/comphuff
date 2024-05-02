@@ -2,17 +2,113 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "gen_fich.h"
+#include <time.h>
+
+
+#define MAX_CHAR 100
 
 #define N 20
-#define ECH 14
-#define NOM_FIC_GEN "tmp.txt"  /* max 20 carac */
+
+#define NOM_FIC_GEN "tmp.txt" /* max 20 carac */
 #define NOM_ARCH "tmp_archive" /* max 20 carac */
-#define NOM_FIC_DONNEES "analyse.csv"
+#define CSV_TAILLE "taille.csv"
+#define CSV_CAR_DIF "car_diff.csv"
+#define CSV_FREQ_DOM "freq_dom.csv"
+#define CSV_FREQ_CROISS "freq_croiss.csv"
+#define CSV_NB_FICH "nb_fich.csv"
+#define CSV_PROF_DOSS "prof_doss.csv"
+
+#define T_TAILLE 14
+#define T_CAR_DIF 9
+#define T_FREQ_DOM 7
+#define T_FREQ_CROISS 7
+#define T_NB_FICH 8
+#define T_PROF_DOSS 6
+
+
+void gen_fich(int nb_car, int nb_car_diff, char * nom){
+    FILE* fic = NULL;
+    int i;
+    
+    if (strcmp(nom, "") != 0){    /* nom de fichier précisé */
+        if ( (fic = fopen(nom, "w")) == NULL ){
+            printf("Erreur ouverture / creation du fichier %s\n", nom);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else {   /* pas de nom */
+        if ( (fic = fopen("gen_fich.txt", "w")) == NULL ){
+            printf("Erreur ouverture / creation du fichier gen_fich.txt\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
+    for (i = 0; i < nb_car; i++){
+        /* écrit les caractère dans l'interval [255; 255 - nb_car_diff] */
+        fputc(255 - (rand() % nb_car_diff), fic);
+    }
+
+    printf("Fichier généré\n");
+    
+    fclose(fic);
+}
+
+
+double somme_tab(double t[], int n){
+    double somme = 0;
+    int i;
+    
+    for (i = 0; i < n; i++){
+        somme += t[i];
+    }
+
+    return somme;
+}
+
+void gen_fich_freq(int nb_car, double freq[], int n, char * nom){
+
+    FILE* fic = NULL;
+    int i, car;
+    double total = somme_tab(freq, n), eff_cumule, alea;
+
+    if (strcmp(nom, "") != 0){    /* nom de fichier précisé */
+        if ( (fic = fopen(nom, "w")) == NULL ){
+            printf("Erreur ouverture / creation du fichier %s\n", nom);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else {   /* pas de nom */
+        if ( (fic = fopen("gen_fich.txt", "w")) == NULL ){
+            printf("Erreur ouverture / creation du fichier gen_fich.txt\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    for (i = 0; i < nb_car; i++){
+        alea = ((double)rand() / (double)RAND_MAX) * total;
+
+        car = 0;
+        
+        eff_cumule = freq[car];
+        
+        while (alea > eff_cumule){
+            car++;
+            eff_cumule += freq[car];
+        }
+        
+        
+        fputc('c' - car, fic);
+    }
+
+    printf("Fichier généré\n");
+    
+    fclose(fic);
+}
+
 
 int taille_fich(FILE * fic){
     char c;
-    int taille;
+    int taille = 0;
     
     while ((c = fgetc(fic)) != EOF){
         taille += 1;
@@ -26,39 +122,49 @@ int main(){
     FILE * csv;
     FILE * tmp;
 
-    char cmd[44] = "huff_vX -c tmp_archive "; /* 23 + 20 + '\0' */
-    char nom_arch[30] = ""; /* 20 + ".comphuff" + '\0' */
+    char cmd[MAX_CHAR]; /* 23 + 20 + '\0' */
+    char nom_arch[MAX_CHAR]; /* 20 + ".comphuff" + '\0' */
     
     int n, indice, i;
-    int nb_car, nb_car_diff, graine;
-    int taille_comp, t_taille_comp[N];
-    int min, max;
+    int nb_car, nb_car_diff, t_fich;
+    int err;
+    double taux_comp, t_taux_comp[N];
+    double min, max;
     double moyenne_comp, ecart_type;
 
     int i_echelle;
-    int echelle[ECH] = {1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000, 10000, 50000, 100000};
-    int echelle_puiss_2[9] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
-    int echelle_freq[8][8] = {{93, 1, 1, 1, 1, 1, 1, 1}, {47.47, 47.47, 1, 1, 1, 1, 1, 1}, {31.66, 31.66, 31.66, 1, 1, 1, 1, 1}, {24, 24, 24, 24, 1, 1, 1, 1}, {19.4, 19.4, 19.4, 19.4, 19.4, 1, 1, 1}, {16.33, 16.33, 16.33, 16.33, 16.33, 16.33, 1, 1}, {14.14, 14.14, 14.14, 14.14, 14.14, 14.14, 14.14, 1}, {12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5}};
-    int echelle_freq_puiss_2[9] = {1, 2, 4, 8, 16, 32, 64, 128};
-    int echelle_fich[7] = {1, 2, 5, 10, 20, 50, 100};
-    int echelle_doss[7] = {0, 1, 2, 5, 10, 20, 50};
     
-    for (i_echelle = 0; i_echelle < ECH; i_echelle++){
+    int ech_taille[T_TAILLE] = {1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000, 10000, 50000, 100000};
+    
+    int ech_puiss_2[T_CAR_DIF] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
 
-        nb_car = echelle[i_echelle];
+    
+    double ech_freq[T_FREQ_DOM][T_FREQ_DOM] = {{93, 1, 1, 1, 1, 1, 1, 1}, {47.47, 47.47, 1, 1, 1, 1, 1, 1}, {31.66, 31.66, 31.66, 1, 1, 1, 1, 1}, {24, 24, 24, 24, 1, 1, 1, 1}, {19.4, 19.4, 19.4, 19.4, 19.4, 1, 1, 1}, {16.33, 16.33, 16.33, 16.33, 16.33, 16.33, 1, 1}, {14.14, 14.14, 14.14, 14.14, 14.14, 14.14, 14.14, 1}, {12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5}};
+
+    double ech_freq_puiss_2[T_FREQ_CROISS] = {1, 2, 4, 8, 16, 32, 64, 128};
+
+    /*
+    int ech_fich[T_NB_FICH] = {1, 2, 5, 10, 20, 50, 100, 200};
+    
+    int ech_doss[T_PROF_DOSS] = {0, 1, 2, 5, 10, 20};
+    */
+    
+    srand(time(NULL));
+
+    /* gen test taille */
+    for (i_echelle = 0; i_echelle < T_TAILLE; i_echelle++){
+
+        nb_car = ech_taille[i_echelle];
         nb_car_diff = 20;
 
-        /* graine de génération */
-        graine = 0;
-
         /* remise à 0 */
-        taille_comp = 0;
+        taux_comp = 0;
         indice = 0;
 
         ecart_type = 0;
    
-        if ((csv = fopen(NOM_FIC_DONNEES, "w")) == NULL){
-            printf("Erreur ouverture fichier %s", NOM_FIC_DONNEES);
+        if ((csv = fopen(CSV_TAILLE, "w")) == NULL){
+            printf("Erreur ouverture fichier %s", CSV_TAILLE);
             exit(EXIT_FAILURE);
         }
 
@@ -66,14 +172,23 @@ int main(){
         for (n = 0; n < N; n++){
 
             /* génération du fichier */
-            gen_fich(nb_car, nb_car_diff, graine, NOM_FIC_GEN);
-            graine++;
+            gen_fich(nb_car, nb_car_diff, NOM_FIC_GEN);
 
             /* compression du fichier */
+            cmd[0] = '\0';
+            strcat(cmd, "huff_v1 -c tmp_archive ");
             strcat(cmd, NOM_FIC_GEN);
-            system(cmd);
+
+            printf("\n\n%s\n\n", cmd);
+            
+            err = system(cmd);
+            if (err != 0){
+                printf("Erreur appel cmd, bye\n");
+                exit(EXIT_FAILURE);
+            }
         
             /* calcul de la taille du fichier compresser */
+            nom_arch[0] = '\0';
             strcat(nom_arch, NOM_ARCH);
             strcat(nom_arch, ".comphuff");
             if ((tmp = fopen(nom_arch, "r")) == NULL){
@@ -81,42 +196,304 @@ int main(){
                 exit(EXIT_FAILURE);
             }
 
-            taille_comp += taille_fich(tmp);
-            t_taille_comp[indice] = taille_comp;  /* pour le calcule de l'écart type */
+            t_fich = taille_fich(tmp);
+            
+            taux_comp += t_fich / nb_car * 100;
+            t_taux_comp[indice] = t_fich / nb_car * 100;  /* pour le calcule de l'écart type : calcul du taux de compression*/
             indice++;
 
             fclose(tmp);
 
+            /* calcul du meilleur et du pire */
             if (n == 0){
-                min = taille_comp;
-                max = taille_comp;
+                min = taux_comp;
+                max = taux_comp;
             }
             else {
-                if (taille_comp < min){
-                    min = taille_comp;
+                if (taux_comp < min){
+                    min = taux_comp;
                 }
-                if (taille_comp > max){
-                    max = taille_com;
+                if (taux_comp > max){
+                    max = taux_comp;
                 }
             }
         }
 
-        /* calcul de la moyenne des tailles de fichier compresser (sans le min et le max) */
-        moyenne_comp = (taille_comp - min - max) / (double)(N - 2);
+        /* calcul de la moyenne des taux de compression (sans le min et le max) */
+        moyenne_comp = (taux_comp - min - max) / (double)(N - 2);
     
-        /* calcul de l'écart type des tailles de fichier compresser (sans le min et le max) */
+        /* calcul de l'écart type des taux de compression (sans le min et le max) */
         for (i = 0; i < N; i++){
-            ecart_type += (t_taille_comp[i] - moyenne_comp) * (t_taille_comp[i] - moyenne_comp);
+            ecart_type += pow((double)t_taux_comp[i] - moyenne_comp, 2.);
         }
-        ecart_type = ecart_type - (min - moyenne_comp) * (min - moyenne_comp) - (max - moyenne_comp) * (max - moyenne_comp)
-        ecart_type = sqrt(ecart_type / (double)(N - 2));
+        ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
+        ecart_type = sqrt(ecart_type / (N - 2));
 
-        /* écrit dans le fichier csv : taille fichier original pour la première courbe, moyenne des tailles de fichier compresser et l'écart type de celui ci */
-        fprintf(csv, "%d,%lf,%lf\n", nb_car, moyenne_comp, ecart_type);
+        /* écrit dans le fichier csv : taille fichier original (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", nb_car, moyenne_comp, ecart_type);
 
     }
     
     fclose(csv);
+
+    /***************************************************************************/
+    /***************************************************************************/
+    /***************************************************************************/
+
+    /* gen test nb car diff */
+    for (i_echelle = 0; i_echelle < T_CAR_DIF; i_echelle++){
+
+        nb_car = 10000;
+        nb_car_diff = ech_puiss_2[i_echelle];
+
+        /* remise à 0 */
+        taux_comp = 0;
+        indice = 0;
+
+        ecart_type = 0;
+   
+        if ((csv = fopen(CSV_CAR_DIF, "w")) == NULL){
+            printf("Erreur ouverture fichier %s", CSV_CAR_DIF);
+            exit(EXIT_FAILURE);
+        }
+
+        /* calcule d'un point de la courbe */
+        for (n = 0; n < N; n++){
+
+            /* génération du fichier */
+            gen_fich(nb_car, nb_car_diff, NOM_FIC_GEN);
+            
+            /* compression du fichier */
+            cmd[0] = '\0';
+            strcat(cmd, "huff_v1 -c tmp_archive ");
+            strcat(cmd, NOM_FIC_GEN);
+            err = system(cmd);
+            if (err != 0){
+                printf("Erreur appel cmd, bye\n");
+                exit(EXIT_FAILURE);
+            }
+        
+            /* calcul de la taille du fichier compresser */
+            nom_arch[0] = '\0';
+            strcat(nom_arch, NOM_ARCH);
+            strcat(nom_arch, ".comphuff");
+            if ((tmp = fopen(nom_arch, "r")) == NULL){
+                printf("Erreur ouverture fichier généré\n");
+                exit(EXIT_FAILURE);
+            }
+
+            t_fich = taille_fich(tmp);
+            
+            taux_comp += t_fich / nb_car * 100;
+            t_taux_comp[indice] = t_fich / nb_car * 100;  /* pour le calcule de l'écart type : calcul du taux de compression*/
+            indice++;
+
+            fclose(tmp);
+
+            /* calcul du meilleur et du pire */
+            if (n == 0){
+                min = taux_comp;
+                max = taux_comp;
+            }
+            else {
+                if (taux_comp < min){
+                    min = taux_comp;
+                }
+                if (taux_comp > max){
+                    max = taux_comp;
+                }
+            }
+        }
+
+        /* calcul de la moyenne des taux de compression (sans le min et le max) */
+        moyenne_comp = (taux_comp - min - max) / (double)(N - 2);
+    
+        /* calcul de l'écart type des taux de compression (sans le min et le max) */
+        for (i = 0; i < N; i++){
+            ecart_type += pow((double)t_taux_comp[i] - moyenne_comp, 2.);
+        }
+        ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
+        ecart_type = sqrt(ecart_type / (N - 2));
+
+        /* écrit dans le fichier csv : taille fichier original (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", nb_car, moyenne_comp, ecart_type);
+
+    }
+    
+    fclose(csv);
+
+    /***************************************************************************/
+    /***************************************************************************/
+    /***************************************************************************/
+
+    /* gen test freq carac dominant */
+    for (i_echelle = 0; i_echelle < T_FREQ_DOM; i_echelle++){
+
+        nb_car = 10000;
+        nb_car_diff = 8;
+
+        /* remise à 0 */
+        taux_comp = 0;
+        indice = 0;
+
+        ecart_type = 0;
+   
+        if ((csv = fopen(CSV_FREQ_DOM, "w")) == NULL){
+            printf("Erreur ouverture fichier %s", CSV_FREQ_DOM);
+            exit(EXIT_FAILURE);
+        }
+
+        /* calcule d'un point de la courbe */
+        for (n = 0; n < N; n++){
+
+            /* génération du fichier */
+            gen_fich_freq(nb_car, ech_freq[i_echelle], T_FREQ_DOM, NOM_FIC_GEN);
+            
+            /* compression du fichier */
+            cmd[0] = '\0';
+            strcat(cmd, "huff_v1 -c tmp_archive ");
+            strcat(cmd, NOM_FIC_GEN);
+            err = system(cmd);
+            if (err != 0){
+                printf("Erreur appel cmd, bye\n");
+                exit(EXIT_FAILURE);
+            }
+        
+            /* calcul de la taille du fichier compresser */
+            nom_arch[0] = '\0';
+            strcat(nom_arch, NOM_ARCH);
+            strcat(nom_arch, ".comphuff");
+            if ((tmp = fopen(nom_arch, "r")) == NULL){
+                printf("Erreur ouverture fichier généré\n");
+                exit(EXIT_FAILURE);
+            }
+
+            t_fich = taille_fich(tmp);
+            
+            taux_comp += t_fich / nb_car * 100;
+            t_taux_comp[indice] = t_fich / nb_car * 100;  /* pour le calcule de l'écart type : calcul du taux de compression*/
+            indice++;
+
+            fclose(tmp);
+
+            /* calcul du meilleur et du pire */
+            if (n == 0){
+                min = taux_comp;
+                max = taux_comp;
+            }
+            else {
+                if (taux_comp < min){
+                    min = taux_comp;
+                }
+                if (taux_comp > max){
+                    max = taux_comp;
+                }
+            }
+        }
+
+        /* calcul de la moyenne des taux de compression (sans le min et le max) */
+        moyenne_comp = (taux_comp - min - max) / (double)(N - 2);
+    
+        /* calcul de l'écart type des taux de compression (sans le min et le max) */
+        for (i = 0; i < N; i++){
+            ecart_type += pow((double)t_taux_comp[i] - moyenne_comp, 2.);
+        }
+        ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
+        ecart_type = sqrt(ecart_type / (N - 2));
+
+        /* écrit dans le fichier csv : taille fichier original (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", nb_car, moyenne_comp, ecart_type);
+
+    }
+    
+    fclose(csv);
+
+    /***************************************************************************/
+    /***************************************************************************/
+    /***************************************************************************/
+
+    /* test freq croissante */
+    for (i_echelle = 0; i_echelle < T_TAILLE; i_echelle++){
+        
+        nb_car = ech_taille[i_echelle];
+        nb_car_diff = 8;
+
+        /* remise à 0 */
+        taux_comp = 0;
+        indice = 0;
+
+        ecart_type = 0;
+   
+        if ((csv = fopen(CSV_FREQ_CROISS, "w")) == NULL){
+            printf("Erreur ouverture fichier %s", CSV_FREQ_CROISS);
+            exit(EXIT_FAILURE);
+        }
+
+        /* calcule d'un point de la courbe */
+        for (n = 0; n < N; n++){
+
+            /* génération du fichier */
+            gen_fich_freq(nb_car, ech_freq_puiss_2[i_echelle], T_FREQ_CROISS, NOM_FIC_GEN);
+            
+            /* compression du fichier */
+            cmd[0] = '\0';
+            strcat(cmd, "huff_v1 -c tmp_archive ");
+            strcat(cmd, NOM_FIC_GEN);
+            err = system(cmd);
+            if (err != 0){
+                printf("Erreur appel cmd, bye\n");
+                exit(EXIT_FAILURE);
+            }
+        
+            /* calcul de la taille du fichier compresser */
+            nom_arch[0] = '\0';
+            strcat(nom_arch, NOM_ARCH);
+            strcat(nom_arch, ".comphuff");
+            if ((tmp = fopen(nom_arch, "r")) == NULL){
+                printf("Erreur ouverture fichier généré\n");
+                exit(EXIT_FAILURE);
+            }
+
+            t_fich = taille_fich(tmp);
+            
+            taux_comp += t_fich / nb_car * 100;
+            t_taux_comp[indice] = t_fich / nb_car * 100;  /* pour le calcule de l'écart type : calcul du taux de compression*/
+            indice++;
+
+            fclose(tmp);
+
+            /* calcul du meilleur et du pire */
+            if (n == 0){
+                min = taux_comp;
+                max = taux_comp;
+            }
+            else {
+                if (taux_comp < min){
+                    min = taux_comp;
+                }
+                if (taux_comp > max){
+                    max = taux_comp;
+                }
+            }
+        }
+
+        /* calcul de la moyenne des taux de compression (sans le min et le max) */
+        moyenne_comp = (taux_comp - min - max) / (double)(N - 2);
+    
+        /* calcul de l'écart type des taux de compression (sans le min et le max) */
+        for (i = 0; i < N; i++){
+            ecart_type += pow((double)t_taux_comp[i] - moyenne_comp, 2.);
+        }
+        ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
+        ecart_type = sqrt(ecart_type / (N - 2));
+
+        /* écrit dans le fichier csv : taille fichier original (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", nb_car, moyenne_comp, ecart_type);
+
+    }
+    
+    fclose(csv);
+    
     
     exit(EXIT_SUCCESS);
 }
