@@ -130,7 +130,9 @@ void creer_noeud(noeud * tab[]) {
     new->c = 0;
     /* on vérifie si on a pu trouver un deuxième noeud plus petit (gestion du cas à un seul caractère) */
     if (i2 == -1) {
+        printf("ye\n");
         new->occurence = tab[i1]->occurence;
+        printf("OK\n");
     }
     else {
         new->occurence = tab[i1]->occurence + tab[i2]->occurence;

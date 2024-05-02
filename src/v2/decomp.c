@@ -49,7 +49,7 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
 
     /* PARTIE ARBRE DE HUFFMAN */
     FILE * fic_decomp = NULL; /* fichier décompressé */
-    char nom_decomp[100];
+    char * nom_decomp = (char *) malloc (100 * sizeof(char));
     
     noeud * arbre_huffman;
     noeud * parcours;
@@ -66,6 +66,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     if (fscanf(f, "%c", &nb_chars) != 1) {
         fprintf(stderr, "Erreur de lecture du nombre de caractères différents\n");
     }
+
+    printf("passe dépassement\n");
 
     /* on lit l'alphabet entier (il y a nb_chars caractères différents) */
     nb_chars_lus = 0;
@@ -153,8 +155,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         exit(EXIT_FAILURE);
     }
 
-    /* afficher_arbre_graphique(arbre_huffman); */
-    
+    afficher_arbre_graphique(arbre_huffman);
+   
     /* on commence au début */
     parcours = arbre_huffman;
     c_next = 0; /* prochain octet, initialisé à 0 pour NULL */
@@ -165,6 +167,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_c[j], fic_decomp);
         j++;
     }
+
+    
 
     /* si il y a encore des octets à lire... */
     /* si on lit un octet, on boucle. sinon pas de boucle */
@@ -195,6 +199,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     }
 
     fclose(fic_decomp);
+
+    printf("passe tout\n");
 
     return arbre_huffman;
 }
