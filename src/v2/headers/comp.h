@@ -21,7 +21,7 @@ int creer_noeuds_caracteres(int tab[256], noeud * arbre_huffman[256]);
 void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2);
 
 /* ########### */
-void creer_noeud(noeud * tab[], int taille);
+void creer_noeud(noeud * tab[]);
 /* Affiche le codage du caractère (int) en binaire. */
 void affichage_code(int nbr_bits, int codage);
 

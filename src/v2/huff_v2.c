@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -145,6 +146,7 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
     char * line = NULL;
     char chemin_fich_part[100];
     size_t len = 0;
+    int chemin_size;
 
     int loop = 1;
     int char_loop = 1;
@@ -183,7 +185,6 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
             loop = 0;
             break;
         }
-        printf("get line: %s\n", line);
 
         strcpy(chemin_fich_part, "");
         if (dossier != NULL) {
@@ -191,7 +192,11 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
             strcat(chemin_fich_part, "/");
         }
         strcat(chemin_fich_part, line);
-        printf("%s\n", chemin_fich_part);
+        /* enlever le saut de ligne à la fin */
+        chemin_size = strlen(chemin_fich_part);
+        chemin_fich_part[ chemin_size - 1 ] = '\0';
+        
+        printf("compression de '%s'\n", chemin_fich_part);
 
         /* créer le fichier avec le bon nom */
         /* vérifier que le fichier n'existe pas déjà? */
@@ -201,7 +206,6 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
             printf("erreur lors de la création du fichier %s\n", chemin_fich_part);
             exit(EXIT_FAILURE);
         }
-        printf("create ok pour le fichier %s\n", line);
 
         /* on récupère des caractères jusqu'à avoir trois fois l'ASCII 1 (séparateur) */
         char_loop = 0;

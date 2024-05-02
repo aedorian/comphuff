@@ -1,0 +1,23 @@
+--------------------------------------
+
+YUNGMANN Tom - AUBE Adrian
+Projet de programmation impérative 3
+Université Jean Monnet
+L2 Informatique
+
+--------------------------------------
+
+Créer l'exécutable principal
+
+      make clean; make huff_v[version]
+      [version] de 0 à 5 compris
+
+--------------------------------------
+
+Créer l'exécutable de la génération de fichiers de tests
+
+      make clean; make
+
+--------------------------------------
+
+Comment générer les fichiers de tests?

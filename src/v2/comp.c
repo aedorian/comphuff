@@ -109,13 +109,11 @@ void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
 
 /* 4.2.7 */
 /* ########### */
-void creer_noeud(noeud * tab[], int taille) {
+void creer_noeud(noeud * tab[]) {
     int i1, i2;
     noeud * new;
     
     deux_entiers_petits(tab, &i1, &i2);
-    
-    printf("indice %d, indice %d\n", i1,  i2);
 
     /* check i1 et i2 != -1 ?  ########  */
 
@@ -171,10 +169,10 @@ void creer_code(noeud * element, int code, int profondeur, noeud * alphabet[256]
             /* rajouté */
         
             affichage_code(profondeur, code);
-            printf("(%c)-", element->c);
+
             /* stockage dans la structure alphabet */
             alphabet[(int)element -> c] = element;
-            printf("%c\n", alphabet[(int) element -> c]->c);
+
         }
         else {
             creer_code(element -> gauche, code * 2, profondeur + 1, alphabet);
@@ -235,24 +233,19 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     c = 0;
     fwrite(&c, sizeof(char), 1, comp);
     
-    /* écriture du nombre de caractère différent */
-    printf("IL Y A %d\n", nb_char);
+    /* écriture du nombre de caractères différents */
     c = (char)nb_char;
-    printf("IL Y A %c %d\n", c, c);
     fwrite(&c, sizeof(char), 1, comp);
 
     /* écriture de la structure alphabet : [(char)(nb_bits)(codage)] * nb_char */
-    printf("ECTIRUE DE L4ALPHABET:\n");
     buffer = 0;
     it = 0;
     for (i = 0; i < 256; i++){
         if (alphabet[i] != NULL) {
             if (alphabet[i] -> codage != -1){
                 /* (char) */
-                printf("%c %d ", alphabet[i]->c, alphabet[i]->codage);
                 buffer = ecrire_fich(comp, &it, buffer, i, 7); /* on écrit 8 bits */
                 /* (nb_bits) */
-                printf("%d \n", alphabet[i]->nb_bits);
                 taille = alphabet[i] -> nb_bits;
                 buffer = ecrire_fich(comp, &it, buffer, taille - 1, 2);  /* on écrit 3 bits */
                 /* (codage) */
@@ -262,20 +255,17 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         }
     }
 
-    printf("fin écriture alphabet\n");
 
     /* écriture du contenu */
     /* parcours caractère par caractère du fichier à compresser */
     /* it = 0; */
 
     while ((c = fgetc(fic)) != EOF){
-        printf("on lit u nchar\n");
         code = alphabet[(int)c] -> codage;
         taille = alphabet[(int)c] -> nb_bits;
         buffer = ecrire_fich(comp, &it, buffer, code, taille - 1);
     }
 
-    printf("fin lecture fich\n");
 
     /* décalage suplémentaire et écriture du reste */
     i = it;
@@ -290,11 +280,9 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         /* écriture du buffer dans le fichier */
         fwrite(&buffer, sizeof(char), 1, comp);
     }
-
-    /* écriture au début du fichier du dépacement */
     
     rewind(comp);   /* Retour au début du fichier */
-    printf("depassement: %d\n", depassement);
+    /* écriture du dépassement au début du fichier */
     fwrite(&depassement, sizeof(char), 1, comp);
     
     fclose(comp);
@@ -327,7 +315,7 @@ void boucle_compresse(FILE * fic, char * nom_fic) {
     /* on crée l'arbre */
     n = n_huffman;
     do {
-        creer_noeud(arbre_huffman, 256);
+        creer_noeud(arbre_huffman);
         n--;
         /* debug_huffman(arbre_huffman, n_huffman); */
     } while (n > 1); /* do while pour empêcher une erreur si il n'y a qu'un seul caractère */
