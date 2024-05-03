@@ -156,9 +156,7 @@ int main(){
 
     int ech_fich[T_NB_FICH] = {1, 2, 5, 10, 20, 50, 100, 200};
 
-    /*
     int ech_doss[T_PROF_DOSS] = {0, 1, 2, 5, 10, 20};
-    */
     
     srand(time(NULL));
 
@@ -518,7 +516,7 @@ int main(){
             
             /* génération des fichiers */
             for (i_mult = 0; i < ech_fich[i_echelle]; i++){
-                sprintf(nom_mult_fich, i_mult);
+                sprintf(nom_mult_fich, "%d", i_mult);
                 gen_fich_freq(nb_car, ech_freq_puiss_2, T_NB_FICH, nom_mult_fich);
                 strcat(cmd_fich, " ");
                 strcat(cmd_fich, nom_mult_fich);
@@ -579,7 +577,7 @@ int main(){
 
     /* suppression des fichiers */
     for (i_mult = 0; i < ech_fich[T_NB_FICH - 1]; i++){
-        sprintf(nom_mult_fich, i_mult);
+        sprintf(nom_mult_fich, "%d", i_mult);
         remove(nom_mult_fich);
     }
 
@@ -615,7 +613,7 @@ int main(){
             
             /* génération des fichiers */
             for (i_mult = 0; i <= ech_doss[i_echelle]; i++){
-                sprintf(nom_mult_doss, i_mult);
+                sprintf(nom_mult_doss, "%d", i_mult);
 
                 strcat(chem_doss, nom_mult_doss);
                 strcat(chem_doss, "/");
@@ -684,7 +682,10 @@ int main(){
     fclose(csv);
 
     /* suppression des dossiers imbriquer */
-    system("rm -r 0/");
+    err = system("rm -r 0/");
+    if (err != 0){
+        printf("Erreur suppression dossier 0/\n");
+    }
     
     
     /***************************************************************************/
@@ -718,7 +719,7 @@ int main(){
             
             /* génération des fichiers */
             for (i_mult = 0; i <= ech_doss[i_echelle]; i++){
-                sprintf(nom_mult_doss, i_mult);
+                sprintf(nom_mult_doss, "%d", i_mult);
 
                 strcat(chem_doss, nom_mult_doss);
                 for (i = (int)(log10((double)i_mult)) + 1; i < 20; i++){
@@ -790,7 +791,10 @@ int main(){
     fclose(csv);
 
     /* suppression des dossiers imbriquer */
-    system("rm -r 00000000000000000000/");
+    err = system("rm -r 00000000000000000000/");
+    if (err != 0){
+        printf("Erreur suppression dossier 00000000000000000000/\n");
+    }
     
     
     /***************************************************************************/
