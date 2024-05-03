@@ -5,8 +5,7 @@ rapport: dire qu'on a pensé à 3 bits pour nb_bits
 
 ---
 
-MARCHE PAS AVEC UN SEUL CHAR V1
-prend pas le nom de l'archive
+attention: maintenant on encode nb_char - 1 (et on récupère nb_char le vrai)
 
 ---
 
