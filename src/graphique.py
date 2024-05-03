@@ -36,4 +36,6 @@ gen("freq_croiss.csv", "Taille", "Taux de compression", "de la taille, fréquenc
 plt.figure(5);
 gen("nb_fich.csv", "Nombre de fichier", "Taux de compression", "du nombre de fichier", "log", 10);
 plt.figure(6);
-gen("prof_doss.csv", "Profondeur des dossiers", "Taux de compression", "de la profondeur des dossiers", "log", 10);
+gen("prof_doss.csv", "Profondeur des dossiers", "Taux de compression", "de la profondeur des dossiers (nom de taille 1 à 2)", "log", 10);
+plt.figure(7);
+gen("prof_doss_plus.csv", "Profondeur des dossiers", "Taux de compression", "de la profondeur des dossiers (nom de taille 20)", "log", 10);

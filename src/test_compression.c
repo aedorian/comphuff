@@ -7,12 +7,13 @@
 
 
 #define MAX_CHAR 100
-#define CHAR_MULT 4
+#define MEGA_CHAR 500
+#define CHAR_MULT 21
 
 #define N 20
 
 #define NOM_FIC_GEN "tmp.txt"
-#define NOM_ARCH "tmp_archive"
+#define NOM_ARCH "tmp_archive.comphuff"
 
 #define CSV_TAILLE "taille.csv"
 #define CSV_CAR_DIF "car_diff.csv"
@@ -20,6 +21,7 @@
 #define CSV_FREQ_CROISS "freq_croiss.csv"
 #define CSV_NB_FICH "nb_fich.csv"
 #define CSV_PROF_DOSS "prof_doss.csv"
+#define CSV_PROF_DOSS_PLUS "prof_doss_plus.csv"
 
 #define T_TAILLE 14
 #define T_CAR_DIF 9
@@ -129,9 +131,11 @@ int main(){
     FILE * tmp;
 
     char cmd[MAX_CHAR] = "huff_v1 -c ";
-    char cmd_fich[MAX_CHAR] = "huff_v2 -c tmp_archive ";
-    char nom_arch[MAX_CHAR];
+    char cmd_fich[MAX_CHAR];
+    char cmd_doss[MEGA_CHAR];
     char nom_mult_fich[CHAR_MULT];
+    char nom_mult_doss[CHAR_MULT];
+    char chem_doss[MEGA_CHAR];
     
     int n, indice, i, i_mult;
     int nb_car, nb_car_diff, t_fich;
@@ -161,9 +165,6 @@ int main(){
     strcat(cmd, NOM_ARCH);
     strcat(cmd, " ");
     strcat(cmd, NOM_FIC_GEN);
-
-    strcat(nom_arch, NOM_ARCH);
-    strcat(nom_arch, ".comphuff");
 
     /* gen test taille */
 
@@ -198,7 +199,7 @@ int main(){
             }
         
             /* calcul de la taille du fichier compresser */
-            if ((tmp = fopen(nom_arch, "r")) == NULL){
+            if ((tmp = fopen(NOM_ARCH, "r")) == NULL){
                 printf("Erreur ouverture fichier généré\n");
                 exit(EXIT_FAILURE);
             }
@@ -279,7 +280,7 @@ int main(){
             }
         
             /* calcul de la taille du fichier compresser */
-            if ((tmp = fopen(nom_arch, "r")) == NULL){
+            if ((tmp = fopen(NOM_ARCH, "r")) == NULL){
                 printf("Erreur ouverture fichier généré\n");
                 exit(EXIT_FAILURE);
             }
@@ -317,8 +318,8 @@ int main(){
         ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
         ecart_type = sqrt(ecart_type / (N - 2));
 
-        /* écrit dans le fichier csv : taille fichier original (x), moyenne des taux de compression (y), ecart type */
-        fprintf(csv, "%d,%f,%f\n", nb_car, moyenne_comp, ecart_type);
+        /* écrit dans le fichier csv : nombre de caractère différent (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", nb_car_diff, moyenne_comp, ecart_type);
 
     }
     
@@ -360,7 +361,7 @@ int main(){
             }
         
             /* calcul de la taille du fichier compresser */
-            if ((tmp = fopen(nom_arch, "r")) == NULL){
+            if ((tmp = fopen(NOM_ARCH, "r")) == NULL){
                 printf("Erreur ouverture fichier généré\n");
                 exit(EXIT_FAILURE);
             }
@@ -398,8 +399,8 @@ int main(){
         ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
         ecart_type = sqrt(ecart_type / (N - 2));
 
-        /* écrit dans le fichier csv : taille fichier original (x), moyenne des taux de compression (y), ecart type */
-        fprintf(csv, "%d,%f,%f\n", nb_car, moyenne_comp, ecart_type);
+        /* écrit dans le fichier csv : nombre de caractère dominant (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", i_echelle, moyenne_comp, ecart_type);
 
     }
     
@@ -441,7 +442,7 @@ int main(){
             }
         
             /* calcul de la taille du fichier compresser */
-            if ((tmp = fopen(nom_arch, "r")) == NULL){
+            if ((tmp = fopen(NOM_ARCH, "r")) == NULL){
                 printf("Erreur ouverture fichier généré\n");
                 exit(EXIT_FAILURE);
             }
@@ -531,7 +532,7 @@ int main(){
             }
         
             /* calcul de la taille du fichier compresser */
-            if ((tmp = fopen(nom_arch, "r")) == NULL){
+            if ((tmp = fopen(NOM_ARCH, "r")) == NULL){
                 printf("Erreur ouverture fichier généré\n");
                 exit(EXIT_FAILURE);
             }
@@ -569,12 +570,18 @@ int main(){
         ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
         ecart_type = sqrt(ecart_type / (N - 2));
 
-        /* écrit dans le fichier csv : taille fichier original (x), moyenne des taux de compression (y), ecart type */
-        fprintf(csv, "%d,%f,%f\n", nb_car, moyenne_comp, ecart_type);
+        /* écrit dans le fichier csv : nombre de fichier (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", ech_fich[i_echelle], moyenne_comp, ecart_type);
 
     }
     
     fclose(csv);
+
+    /* suppression des fichiers */
+    for (i_mult = 0; i < ech_fich[T_NB_FICH - 1]; i++){
+        sprintf(nom_mult_fich, i_mult);
+        remove(nom_mult_fich);
+    }
 
     /***************************************************************************/
     /***************************************************************************/
@@ -582,21 +589,218 @@ int main(){
 
 
     /* test prof dossier */
+    if ((csv = fopen(CSV_PROF_DOSS, "w")) == NULL){
+        printf("Erreur ouverture fichier %s", CSV_PROF_DOSS);
+        exit(EXIT_FAILURE);
+    }
+
+    cmd_doss[0] = '\0';
+    strcat(cmd_doss, "huff_v4 -c ");
+    strcat(cmd_doss, NOM_ARCH);
+    strcat(cmd_doss, " 0/");
+
+    for (i_echelle = 0; i_echelle < T_PROF_DOSS; i_echelle++){
+        
+        nb_car = 1000;
+        nb_car_diff = 32;
+
+        /* remise à 0 */
+        taux_comp = 0;
+        indice = 0;
+
+        ecart_type = 0;
+
+        /* calcule d'un point de la courbe */
+        for (n = 0; n < N; n++){
+            
+            /* génération des fichiers */
+            for (i_mult = 0; i <= ech_doss[i_echelle]; i++){
+                sprintf(nom_mult_doss, i_mult);
+
+                strcat(chem_doss, nom_mult_doss);
+                strcat(chem_doss, "/");
+                
+                err = mkdir(chem_doss, 0777);
+                if (err != 0){
+                    fprintf(stderr, "∃");
+                }
+
+                strcat(cmd_doss, " ");
+                strcat(cmd_doss, chem_doss);
+            }
+            fprintf(stderr, "\n");
+            
+            /* compression du fichier */
+            err = system(cmd_doss);
+            if (err != 0){
+                printf("Erreur appel cmd, bye\n");
+                exit(EXIT_FAILURE);
+            }
+        
+            /* calcul de la taille du fichier compresser */
+            if ((tmp = fopen(NOM_ARCH, "r")) == NULL){
+                printf("Erreur ouverture fichier généré\n");
+                exit(EXIT_FAILURE);
+            }
+
+            t_fich = taille_fich(tmp);
+            
+            taux_comp += t_fich / nb_car * 100;
+            t_taux_comp[indice] = t_fich / nb_car * 100;  /* pour le calcule de l'écart type : calcul du taux de compression*/
+            indice++;
+
+            fclose(tmp);
+
+            /* calcul du meilleur et du pire */
+            if (n == 0){
+                min = taux_comp;
+                max = taux_comp;
+            }
+            else {
+                if (taux_comp < min){
+                    min = taux_comp;
+                }
+                if (taux_comp > max){
+                    max = taux_comp;
+                }
+            }
+        }
+
+        /* calcul de la moyenne des taux de compression (sans le min et le max) */
+        moyenne_comp = (taux_comp - min - max) / (double)(N - 2);
+    
+        /* calcul de l'écart type des taux de compression (sans le min et le max) */
+        for (i = 0; i < N; i++){
+            ecart_type += pow((double)t_taux_comp[i] - moyenne_comp, 2.);
+        }
+        ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
+        ecart_type = sqrt(ecart_type / (N - 2));
+
+        /* écrit dans le fichier csv : nombre de fichier (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", ech_fich[i_echelle], moyenne_comp, ecart_type);
+
+    }
+    
+    fclose(csv);
+
+    /* suppression des dossiers imbriquer */
+    system("rm -r 0/");
     
     
     /***************************************************************************/
     /***************************************************************************/
     /***************************************************************************/
 
+    /* test prof dossier */
+    if ((csv = fopen(CSV_PROF_DOSS, "w")) == NULL){
+        printf("Erreur ouverture fichier %s", CSV_PROF_DOSS);
+        exit(EXIT_FAILURE);
+    }
+
+    cmd_doss[0] = '\0';
+    strcat(cmd_doss, "huff_v4 -c ");
+    strcat(cmd_doss, NOM_ARCH);
+    strcat(cmd_doss, " 00000000000000000000/");
+
+    for (i_echelle = 0; i_echelle < T_PROF_DOSS; i_echelle++){
+        
+        nb_car = 1000;
+        nb_car_diff = 32;
+
+        /* remise à 0 */
+        taux_comp = 0;
+        indice = 0;
+
+        ecart_type = 0;
+
+        /* calcule d'un point de la courbe */
+        for (n = 0; n < N; n++){
+            
+            /* génération des fichiers */
+            for (i_mult = 0; i <= ech_doss[i_echelle]; i++){
+                sprintf(nom_mult_doss, i_mult);
+
+                strcat(chem_doss, nom_mult_doss);
+                for (i = (int)(log10((double)i_mult)) + 1; i < 20; i++){
+                    strcat(chem_doss, "0");
+                }
+                strcat(chem_doss, "/");
+                
+                err = mkdir(chem_doss, 0777);
+                if (err != 0){
+                    fprintf(stderr, "∃");
+                }
+
+                strcat(cmd_doss, " ");
+                strcat(cmd_doss, chem_doss);
+            }
+            fprintf(stderr, "\n");
+            
+            /* compression du fichier */
+            err = system(cmd_doss);
+            if (err != 0){
+                printf("Erreur appel cmd, bye\n");
+                exit(EXIT_FAILURE);
+            }
+        
+            /* calcul de la taille du fichier compresser */
+            if ((tmp = fopen(NOM_ARCH, "r")) == NULL){
+                printf("Erreur ouverture fichier généré\n");
+                exit(EXIT_FAILURE);
+            }
+
+            t_fich = taille_fich(tmp);
+            
+            taux_comp += t_fich / nb_car * 100;
+            t_taux_comp[indice] = t_fich / nb_car * 100;  /* pour le calcule de l'écart type : calcul du taux de compression*/
+            indice++;
+
+            fclose(tmp);
+
+            /* calcul du meilleur et du pire */
+            if (n == 0){
+                min = taux_comp;
+                max = taux_comp;
+            }
+            else {
+                if (taux_comp < min){
+                    min = taux_comp;
+                }
+                if (taux_comp > max){
+                    max = taux_comp;
+                }
+            }
+        }
+
+        /* calcul de la moyenne des taux de compression (sans le min et le max) */
+        moyenne_comp = (taux_comp - min - max) / (double)(N - 2);
+    
+        /* calcul de l'écart type des taux de compression (sans le min et le max) */
+        for (i = 0; i < N; i++){
+            ecart_type += pow((double)t_taux_comp[i] - moyenne_comp, 2.);
+        }
+        ecart_type = ecart_type - pow((double)min - moyenne_comp, 2.) - pow((double)max - moyenne_comp, 2.);
+        ecart_type = sqrt(ecart_type / (N - 2));
+
+        /* écrit dans le fichier csv : nombre de fichier (x), moyenne des taux de compression (y), ecart type */
+        fprintf(csv, "%d,%f,%f\n", ech_fich[i_echelle], moyenne_comp, ecart_type);
+
+    }
+    
+    fclose(csv);
+
+    /* suppression des dossiers imbriquer */
+    system("rm -r 00000000000000000000/");
+    
+    
+    /***************************************************************************/
+    /***************************************************************************/
+    /***************************************************************************/
+    
     /* suppression des fichiers temporaire */
     remove(NOM_FIC_GEN);
     remove(NOM_ARCH);
 
-    for (i_mult = 0; i < ech_fich[T_NB_FICH - 1]; i++){
-        sprintf(nom_mult_fich, i_mult);
-        remove(nom_mult_fich);
-    }
 
-    
     exit(EXIT_SUCCESS);
 }
