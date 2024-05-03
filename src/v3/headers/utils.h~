@@ -20,9 +20,6 @@ et le retourne. */
 /* ex: si n = 2 et nb_bits = 3, renvoie "010" */
 char * int2string(int n, int nb_bits);
 
-/* transforme un int (4 octets) sur 1 octet (char) */
-char int2char(int n);
-
 /* Calcule la taille de s,
 Et la retourne. */
 int taille(char *s);

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h> /* INT_MAX */
-#include <MLV/MLV_all.h>
+/* #include <MLV/MLV_all.h>*/
+#include <string.h>
 
 #include "headers/arbre.h"
 #include "headers/comp.h"
@@ -234,8 +235,7 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         exit(EXIT_FAILURE);
     }
 
-    printf("passe début\n");
-
+    printf("passe début, nb_char = %d\n", nb_char);
 
     /* écriture de l'en-tête */
     /* on écrit un emplacement à remplacer par le rewind de la fin pour le dépassement */
@@ -244,12 +244,10 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     
     /* écriture du nombre de caractères différents */
     /* FONCTION CUSTOM INT TO CHAR */
-    c = (unsigned char)nb_char;
-    fwrite(&nb_char, sizeof(char), 1, comp);
-    printf("NB CHAR %d\n", nb_char);
-
-    fclose(comp);
-    return;
+    printf("3: %d\n", int2char(3));
+    c = int2char(nb_char-1); /* NB_CHAR - 1 */
+    fwrite(&c, sizeof(char), 1, comp);
+    printf("NB CHAR %d\n", c);
     
 
     /* écriture de la structure alphabet : [(char)(nb_bits)(codage)] * nb_char */

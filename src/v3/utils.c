@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <MLV/MLV_all.h>
+/* #include <MLV/MLV_all.h> */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -57,6 +57,26 @@ char * int2string(int n, int nb_bits) {
     codage[nb_bits] = '\0';
 
     return codage;
+}
+
+/* transforme un int (4 octets) sur 1 octet (char) */
+char int2char(int n) {
+  char final = 0;
+  int i;
+  int buffer[8];
+
+  for (i = 7; i >= 0; i--) {
+    printf("n = %d\n", n);
+    buffer[i] = (unsigned int)n % 2;
+    n = n >> 1;
+  }
+
+  for (i = 7; i >= 0; i--) {
+    printf("%d : %d (on ajoute %d)\n", i, buffer[i], buffer[i] * puiss_2(i));
+    final += buffer[7-i] * puiss_2(i);
+  }
+
+  return final;
 }
 
 /* Calcule la taille de s,

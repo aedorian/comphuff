@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <MLV/MLV_all.h>
+/* #include <MLV/MLV_all.h> */
 
 #include <string.h>
 
@@ -34,7 +34,7 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     noeud * alphabet[256];
     
     /* à lire au début (des int) */
-    char nb_chars = 0; /* nombre de caractères différents */
+    int nb_chars = 0; /* nombre de caractères différents */
     char depassement = 0; /* dans le dernier octet */
     
     int a_obtenir = CHAR;
@@ -50,6 +50,8 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     
     int char_lu = 0; /* le caractère en train d'être lu. aussi utilisé pour indexer alphabet */
     int lu; /* OBSOLETE */
+
+    int debut = 1; /* si l'arbre contient l'ASCII 0 (crash si non précisé) */
 
     /* PARTIE ARBRE DE HUFFMAN */
     FILE * fic_decomp = NULL; /* fichier décompressé */
@@ -72,6 +74,7 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     if (fscanf(f, "%c", &nb_chars) != 1) {
         fprintf(stderr, "Erreur de lecture du nombre de caractères différents\n");
     }
+    nb_chars += 1; /* on a ajouté -1 avant */
 
     printf("passe dépassement (dep = %d) (nb_chars = %d)\n", depassement, nb_chars);
 
@@ -120,15 +123,21 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
                     lu = bin2int(buffer_r, taille_code);
                     i_r = 0;
                     a_obtenir = CHAR;
-                    
+
+		    if (char_lu == 0) {
+		      printf("A ZERO\n");
+		      debut = 0;
+		    }
+
                     /* on a maintenant lu les 3 données (char, taille code, code) d'un caractère */
                     /* on peut créer un noeud dans alphabet */
-                    alphabet[char_lu] = (noeud *) malloc (sizeof(noeud));
+                    alphabet[char_lu] = (noeud *) malloc (1 * sizeof(noeud));
                     if (alphabet[char_lu] == NULL) {
                         fprintf(stderr, "Erreur boucle_decompresse: erreur d'allocation mémoire\n");
                         exit(EXIT_FAILURE);  /* EXIT ??? NULL ? */
                     }
-                    printf("char lu: %d %c\n", char_lu, char_lu);
+
+                    printf("char lu: %d %c (codage: %d | nb_bits = %d)\n", char_lu, char_lu, lu, taille_code);
                     alphabet[char_lu]->c = char_lu;
                     alphabet[char_lu]->codage = lu;
                     alphabet[char_lu]->nb_bits = taille_code;
@@ -143,12 +152,14 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
 
     debug("passe entete");
 
+    printf("test? %d\n", alphabet[0] == NULL);
+
     /* debug_alphabet(alphabet);*/
 
     /* FIN DE LECTURE DE L'ALPHABET */
     /* on ne ferme pas le fichier, on l'utilisera plus tard pour lire le contenu du fichier */
     
-    arbre_huffman = creer_huffman_inverse(alphabet);
+    arbre_huffman = creer_huffman_inverse(alphabet, debut);
 
     debug("passe huffman");
 
@@ -248,7 +259,7 @@ void inserer_arbre(noeud * a, int c, char * code, int pos) {
 
 /* Crée l'arbre de Huffman à partir d'un alphabet,
 et le retourne. */
-noeud * creer_huffman_inverse(noeud * alphabet[256]) {
+noeud * creer_huffman_inverse(noeud * alphabet[256], int debut) {
     noeud * arbre_huffman;
     char * chaine_code;
     int i;
@@ -257,7 +268,8 @@ noeud * creer_huffman_inverse(noeud * alphabet[256]) {
 
     arbre_huffman = creer_arbre('.', NULL, NULL); /* crée un noeud */
 
-    for (i = 0; i < 256; i++) {
+    for (i = debut; i < 256; i++) {
+      printf("i étape %d test %d\n", i);
         if (alphabet[i] != NULL) {
             
             /* générer la chaîne de caractères */

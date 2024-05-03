@@ -17,7 +17,7 @@ void inserer_arbre(noeud * a, int c, char * code, int pos);
 
 /* Crée l'arbre de Huffman à partir d'un alphabet,
 et le retourne. */
-noeud * creer_huffman_inverse(noeud * alphabet[256], int debut);
+noeud * creer_huffman_inverse(noeud * alphabet[256]);
 
 /* Permet de décompresser le fichier binaire f formaté : dépacement, nombre de caractères différents, structure alphabet, contenu compressé.
 Retourne l'abre de codage associé au fichier f compressé. */
