@@ -1,6 +1,8 @@
 # Projet programmation impérative 3
 ## OUVERTURE BINAIRE DE LA BASE
 
+rapport: dire qu'on a pensé à 3 bits pour nb_bits
+
 ---
 
 MARCHE PAS AVEC UN SEUL CHAR V1

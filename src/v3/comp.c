@@ -10,10 +10,10 @@
 
 /* Compte le nombre d'occurences de chaque caractère dans le fichier fic et place le résultat dans un tableau. */
 void occurence(FILE *fic, int tab[256]) {
-    char c;
+    int c; /* pas char */
     
     while ((c = fgetc(fic)) != EOF) {
-        /* printf("%c", c); */
+        printf("%c %d", c, c);
         tab[(int)c] += 1;
     }
 }
@@ -208,6 +208,10 @@ char ecrire_fich(FILE * fic, int *it, char buffer, int code, int start){
     return buffer;
 }
 
+
+
+
+
 /* Crée et écrit dans le fichier compresser avec l'extension .comphuff
 le fichier sera de la forme : dépacement, nombre de caractères différent, structure alphabet, contenu compressé. */
 void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabet[256]){
@@ -215,6 +219,7 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     char nom_comp[89]; /* nom du fichier compressé ###### (taille max de nom_fichier : 80)*/
     char buffer, c, depassement; /* 1 char = 8 bits */
     int code, taille, it, i;
+    int cget;
     
     /* on se place au début du fichier à compresser */
     rewind(fic);
@@ -229,6 +234,8 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         exit(EXIT_FAILURE);
     }
 
+    printf("passe début\n");
+
 
     /* écriture de l'en-tête */
     /* on écrit un emplacement à remplacer par le rewind de la fin pour le dépassement */
@@ -236,8 +243,14 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     fwrite(&c, sizeof(char), 1, comp);
     
     /* écriture du nombre de caractères différents */
-    c = (char)nb_char;
-    fwrite(&c, sizeof(char), 1, comp);
+    /* FONCTION CUSTOM INT TO CHAR */
+    c = (unsigned char)nb_char;
+    fwrite(&nb_char, sizeof(char), 1, comp);
+    printf("NB CHAR %d\n", nb_char);
+
+    fclose(comp);
+    return;
+    
 
     /* écriture de la structure alphabet : [(char)(nb_bits)(codage)] * nb_char */
     buffer = 0;
@@ -249,7 +262,8 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
                 buffer = ecrire_fich(comp, &it, buffer, i, 7); /* on écrit 8 bits */
                 /* (nb_bits) */
                 taille = alphabet[i] -> nb_bits;
-                buffer = ecrire_fich(comp, &it, buffer, taille - 1, 2);  /* on écrit 3 bits */
+                buffer = ecrire_fich(comp, &it, buffer, taille - 1, 7);  /* on écrit 8 bits */
+                
                 /* (codage) */
                 code = alphabet[i] -> codage;
                 buffer = ecrire_fich(comp, &it, buffer, code, taille - 1);
@@ -257,14 +271,16 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         }
     }
 
+    printf("passe écrire alphabet\n");
+
 
     /* écriture du contenu */
     /* parcours caractère par caractère du fichier à compresser */
     /* it = 0; */
 
-    while ((c = fgetc(fic)) != EOF){
-        code = alphabet[(int)c] -> codage;
-        taille = alphabet[(int)c] -> nb_bits;
+    while ((cget = fgetc(fic)) != EOF){
+        code = alphabet[(int)cget] -> codage;
+        taille = alphabet[(int)cget] -> nb_bits;
         buffer = ecrire_fich(comp, &it, buffer, code, taille - 1);
     }
 
@@ -292,21 +308,6 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
 
 void dbg(char * s) {
     printf("%s\n", s);
-}
-
-void debug_alphabet(noeud * a[256]) {
-    int i;
-
-    for (i = 0; i < 256; i++) {
-        printf("a[%d] : ", i);
-        if (a[i] == NULL) {
-            printf("NULL - ");
-        } else {
-            printf("%c ", a[i]->c);
-            affichage_code(a[i]->nb_bits, a[i]->codage);
-            printf("\n");
-        }
-    }
 }
 
 /* boucle principale pour compresser un fichier et l'ajouter à la fin d'un nouveau fichier compressé */
@@ -371,5 +372,5 @@ void boucle_compresse(FILE * fic, char * nom_fic) {
     creer_compresse(nom_fic, fic, n_huffman, alphabet);
 
     dbg("passe creer compresse");
-    afficher_arbre_graphique(arbre_huffman[0]);
+    /* afficher_arbre_graphique(arbre_huffman[0]);*/
 }

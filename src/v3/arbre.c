@@ -119,7 +119,7 @@ void afficher_arbre_graphique_aux(noeud * a, int pos_x, int pos_y, int prev_x, i
         afficher_arbre_graphique_aux(a->droit, pos_x + dec_x / 2, pos_y + AFF_DEC_Y, pos_x, pos_y, dec_x / 2);
     }
 
-    /*   MLV_draw_text(pos_x, pos_y, aff, MLV_COLOR_WHITE); */
+    /* MLV_draw_text(pos_x, pos_y, aff, MLV_COLOR_WHITE); */
 
     if ((a->occurence / 10) == 0) {
         aff[0] = a->occurence + '0';

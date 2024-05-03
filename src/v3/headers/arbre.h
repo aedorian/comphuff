@@ -9,7 +9,7 @@
 /* début 4.2 */
 
 typedef struct noeud {
-    char c; /* caractère initial */
+    int c; /* caractère initial */
     int occurence; /* occurence dans le fichier */
     int codage; /* nouveau codage du caractère */
     int nb_bits; /* nombre de bits sur lequel est codé le caractère */
