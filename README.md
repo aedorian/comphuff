@@ -4,6 +4,7 @@
 rapport: dire qu'on a pensé à 3 bits pour nb_bits
 on a enlevé le meilleur et le pire
 plus de 128 caractères: codage prend 1 octet donc compresse moins bien?
+nom du fichier est pris en compte dans la taille du fichier compressé
 
 ---
 
