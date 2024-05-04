@@ -6,6 +6,12 @@ on a enlevé le meilleur et le pire
 plus de 128 caractères: codage prend 1 octet donc compresse moins bien?
 nom du fichier est pris en compte dans la taille du fichier compressé
 
+nom de fichier différent à chaque version aurait été mieux
+
+ne compile pas les dossiers vides (à cacher?)
+
+peut bien faire une décomposition dans un dossier à chaque version
+
 ---
 
 attention: maintenant on encode nb_char - 1 (et on récupère nb_char le vrai)
