@@ -23,7 +23,7 @@ def gen(nom_fich, axe_x, axe_y, fct_de, scale="none", base_log=10):
     plt.ylabel(axe_y)
     plt.title(f'{axe_y} en fonction {fct_de}', fontsize = 11)
     plt.grid()
-    plt.savefig(nom_fich[:-4] + ".png")
+    plt.savefig(nom_fich[:-3] + "png")
 
 
 gen("taille.csv", "Taille", "Taux de compression", "de la taille", "log", 10);
