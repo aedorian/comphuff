@@ -2,6 +2,8 @@
 ## OUVERTURE BINAIRE DE LA BASE
 
 rapport: dire qu'on a pensé à 3 bits pour nb_bits
+on a enlevé le meilleur et le pire
+plus de 128 caractères: codage prend 1 octet donc compresse moins bien?
 
 ---
 
@@ -96,14 +98,6 @@ code compressé des caractères du fichier
 - soit chaque deux octets (char)(code)
 	-> et recrée arbre petit à petit
 - nombre max de nb_bits possible?
-
-# Bugs A RESOUDRE ALBOSUMENT
-- erreur avec mlv draw text
-- un seul caractère: encodé par rien!!!!!!
-
-# Notes
-
-- faire un malloc avec toute la taille direct? pour fread
 
 # Ajouté depuis dernière fois
 
