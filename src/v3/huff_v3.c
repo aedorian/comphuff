@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <MLV/MLV_all.h>
+/* #include <MLV/MLV_all.h>*/
 #include <stddef.h>
 
 #include <dirent.h> /* pour lister les fichiers d'un dossier */
@@ -28,15 +28,13 @@ void afficher_doc(){
 
 
 /* ----------------------------------------------------------------------- */
-/* DEBUT PLUSIEURS FICHIERS */
+/* UTILITAIRES POUR LA MANIPULATION DE CHEMINS */
 /* ----------------------------------------------------------------------- */
-
 
 char * obtenir_nom_dernier_dossier(char * chemin) {
 
     char * dernier_dossier = (char *) malloc (100 * sizeof(char)); /* dernier bon dossier */
     const char * separators = "/";
-    int boucle = 0;
 
     char * tok = strtok(chemin, separators);
     
@@ -54,26 +52,13 @@ char * obtenir_nom_dernier_dossier(char * chemin) {
 char * obtenir_nom_dossier(char * chemin) {
 
     char * chemin_copie = (char *) malloc (100 * sizeof(char));
-    char * dernier_dossier = (char *) malloc (100 * sizeof(char)); /* dernier bon dossier */
     const char * separators = "/";
-    int boucle = 0;
-    int nombre = 0;
 
     char * tok =  (char *) malloc (100 * sizeof(char));
 
     strcpy(chemin_copie, chemin);
     
     tok = strtok(chemin_copie, separators);
-
-    /*
-    while (tok != NULL) {
-
-        strcpy(dernier_dossier, tok);
-                printf("-- %s\n", dernier_dossier);
-        tok = strtok(NULL, separators);
-        nombre += 1;
-    }
-    */
 
     if (strcmp(tok, chemin) == 0) {
         return chemin_copie;
@@ -85,6 +70,13 @@ char * obtenir_nom_dossier(char * chemin) {
     
 }
 
+/* ----------------------------------------------------------------------- */
+/* FIN UTILITAIRES POUR LA MANIPULATION DE CHEMINS */
+/* ----------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------------- */
+/* ECRITURE DE FICHIERS */
+/* ----------------------------------------------------------------------- */
 
 void ecrire_fichier_dans_fichier_tmp(FILE * fich_tmp, char * chemin, char * nom) {
 
@@ -240,7 +232,13 @@ void compression_multifichiers(char * argv[], int argc) {
 
 
 
+/* ----------------------------------------------------------------------- */
+/* FIN ECRITURE DE FICHIERS */
+/* ----------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------------------- */
+/* DECOMPRESSION */
+/* ----------------------------------------------------------------------- */
 
 
 /* reconstitue les fichiers de chemin_fich dans le dossier dossier */
@@ -399,7 +397,7 @@ void decompression_multifichiers(FILE * f, char * nom_fichier, char * chemin_dos
 
 
 /* ----------------------------------------------------------------------- */
-/* FIN PLUSIEURS FICHIERS */
+/* FIN DECOMPRESSION */
 /* ----------------------------------------------------------------------- */
 
 

@@ -27,30 +27,124 @@ void afficher_doc(){
 
 
 
+/* ----------------------------------------------------------------------- */
+/* UTILITAIRES POUR LA MANIPULATION DE CHEMINS */
+/* ----------------------------------------------------------------------- */
 
 
+char * obtenir_nom_dernier_dossier(char * chemin) {
 
+    char * dernier_dossier = (char *) malloc (100 * sizeof(char)); /* dernier bon dossier */
+    const char * separators = "/";
 
+    char * tok = strtok(chemin, separators);
+    
+    while (tok != NULL) {
+
+        strcpy(dernier_dossier, tok);
+        tok = strtok(NULL, separators);
+    }
+    
+    return dernier_dossier;
+}
+
+/* pour reconstituer les fichiers: obtient le premier nom de dossier dans la chaîne */
+/* exemple: "doss/fich.txt" donnera "doss" */
+char * obtenir_nom_dossier(char * chemin) {
+
+    char * chemin_copie = (char *) malloc (100 * sizeof(char));
+    const char * separators = "/";
+
+    char * tok =  (char *) malloc (100 * sizeof(char));
+
+    strcpy(chemin_copie, chemin);
+    
+    tok = strtok(chemin_copie, separators);
+
+    if (strcmp(tok, chemin) == 0) {
+        return chemin_copie;
+    }
+    else {
+      printf("envoie %s\n", tok);
+      return tok;
+    }
+    
+}
+
+/* décompose le chemin et recrée chaque dossier */
+/* exemple: doss/doss2/doss3 va recréer successivement l'arborescence */
+char * decomposer_creer(char * chemin, char * dans_dossier) {
+
+  char * chemin_copie = (char *) malloc (100 * sizeof(char)); /* copie du chemin */
+  char * chemin_entier = (char *) malloc (100 * sizeof(char)); /* les dossiers imbriqués viennent se rajouter */
+  const char * separators = "/";
+  char * partie = (char *) malloc (100 * sizeof(char));
+  char * tok;
+  int etape = 0; /* pour ne pas recréer le fichier à la fin */
+
+  strcpy(chemin_copie, chemin);
+  
+  printf("création de l'arborescence: %s\n", chemin_copie);
+  tok = strtok(chemin_copie, separators);
+  strcpy(partie, tok);
+
+  strcpy(chemin_entier, "");
+  if (dans_dossier != NULL) {
+    printf("DANS DOSSIER %s\n", dans_dossier);
+    strcat(chemin_entier, dans_dossier);
+    strcat(chemin_entier, "/");
+  }
+  printf("ENTIERR %s\n", chemin_entier);
+
+  while (tok != NULL) {
+
+    if (etape != 0) {
+      strcat(chemin_entier, partie);
+    strcat(chemin_entier, "/");
+      printf("crée: %s\n", chemin_entier);
+      if (mkdir(chemin_entier, 0777)) {
+	printf("Erreur de création du dossier %s (il se peut qu'il existe)\n", chemin_entier);
+      }
+          /* on peut reconstituer le dossier ici */
+    }
+    strcpy(partie, tok);
+    
+    tok = strtok(NULL, separators);
+    etape++;
+  }
+
+  printf("decomposer: retourne %s\n", chemin_entier);
+  return chemin_entier;
+}
+
+/* ----------------------------------------------------------------------- */
+/* FIN UTILITAIRES POUR LA MANIPULATION DE CHEMINS */
+/* ----------------------------------------------------------------------- */
 
 /* ----------------------------------------------------------------------- */
 /* ECRITURE DE FICHIERS */
 /* ----------------------------------------------------------------------- */
 
-
-void ecrire_fichier_dans_fichier_tmp(FILE * fich_tmp, char * chemin) {
+void ecrire_fichier_dans_fichier_tmp(FILE * fich_tmp, char * chemin, char * nom, char * nom_archive) {
 
     FILE * fich = NULL;
+    char * chemin_avec_archive = (char *) malloc (100 * sizeof(char));
 
     int c;
 
     fich = fopen(chemin, "r");
+    printf("'ouverture du fichier '%s'\n", chemin);
     if (fich == NULL) {
+        printf("Erreur d'ouverture du fichier '%s'\n", chemin);
         exit(EXIT_FAILURE);
     }
 
-    /* POUR LA V2: ON ECRIT LE CHEMIN COMME BASENAME */
-    /* ATTENTION POUR AUTRES VERSIONS */
-    fprintf(fich_tmp, "%s\n", nom_fich_base(chemin));
+    strcpy(chemin_avec_archive, "");
+    strcat(chemin_avec_archive, nom_archive);
+    strcat(chemin_avec_archive, "/");
+    strcat(chemin_avec_archive, nom);
+
+    fprintf(fich_tmp, "%s\n", chemin_avec_archive);
 
     /* on écrit le contenu du fichier */
     while ((c = fgetc(fich)) != EOF) {
@@ -63,6 +157,61 @@ void ecrire_fichier_dans_fichier_tmp(FILE * fich_tmp, char * chemin) {
 }
 
 
+
+/* écrit les fichiers contenus dans un dossier dans le fichier temporaire fich_tmp */
+void ecrire_fichiers_dossier_dans_fichier_tmp(FILE * fich_tmp, char * chemin_dossier, char * nom_archive) {
+    DIR * d;
+    struct dirent *dir;
+    char dir_path[100];
+    char file_name[100];
+    char * chemin_copie = (char *) malloc (100 * sizeof(char)); 
+    int i = 1;
+
+    /* nom du dernier dossier */
+    char nom_dossier[100];
+
+    strcpy(chemin_copie, chemin_dossier);
+    d = opendir(chemin_dossier);
+
+    /* pour obtenir le bon nom du dossier */
+    /* strcpy(nom_dossier, obtenir_nom_dernier_dossier(chemin_dossier)); */
+    strcpy(nom_dossier, chemin_dossier);
+    printf("nom dossier obtenu: %s\n", nom_dossier);
+        
+    if (d) {
+        
+        while ((dir = readdir(d)) != NULL) {
+            /* exclure . et .. */
+            if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) {
+
+                /* recréer le chemin d'accès du fichier */
+                /* printf("d_name: %s\n", d);*/
+                strcpy(dir_path, chemin_copie);
+                strcat(dir_path, "/");
+                strcat(dir_path, dir->d_name);
+
+                /* nom du fichier */
+                strcpy(file_name, nom_dossier);
+                strcat(file_name, "/");
+                strcat(file_name, dir->d_name);
+                
+                if (!est_fichier(dir_path)) {
+		  /* si c'est un dossier, appel récursif */
+                  ecrire_fichiers_dossier_dans_fichier_tmp(fich_tmp, dir_path, nom_archive);
+                }
+		else {
+		  printf("fichier %d: %s\n", i, dir->d_name);
+
+		  ecrire_fichier_dans_fichier_tmp(fich_tmp, dir_path, file_name, nom_archive);
+		}
+                
+                i++;
+            }
+        }
+        closedir(d);
+        
+    }
+}
 
 
 void compiler_dans_fichier_tmp(char * argv[], int argc) {
@@ -78,19 +227,24 @@ void compiler_dans_fichier_tmp(char * argv[], int argc) {
         exit(EXIT_FAILURE);
     }
 
-    /* ATTENTOONNNNNNNNNNNNNNNNNNNN BOUCLE SEPAREES DANS PLUSIEURS FONCTIONS PORU LES V DIFFERENTES */
     for (i_fich = 3; i_fich < argc; i_fich++) {
 
         fichier_valide = est_fichier(argv[i_fich]);
-        /* si le fichier est un dossier ou que le fichier n'existe pas, on ne le traite pas */
+        /* si c'est un fichier */
         if (fichier_valide == 1) {
 
-            ecrire_fichier_dans_fichier_tmp(fich_tmp, argv[i_fich]);
+	  ecrire_fichier_dans_fichier_tmp(fich_tmp, argv[i_fich], argv[i_fich], argv[2]);
 
             printf("fichier '%s' bien traité\n", argv[i_fich]);
         }
         else {
-            printf("erreur: le fichier '%s' n'a pas pu être traité (c'est soit un dossier, soit il n'existe pas)\n", argv[i_fich]);
+            if (fichier_valide == 0) {
+                printf("ouverture du dossier '%s'\n", argv[i_fich]);
+                ecrire_fichiers_dossier_dans_fichier_tmp(fich_tmp, argv[i_fich], argv[2]);
+            }
+            else {
+                printf("erreur: le fichier '%s' n'a pas pu être traité (il n'existe probablement pas)\n", argv[i_fich]);
+            }
         }
         
     }
@@ -142,6 +296,7 @@ void compression_multifichiers(char * argv[], int argc) {
 /* ----------------------------------------------------------------------- */
 
 
+
 /* reconstitue les fichiers de chemin_fich dans le dossier dossier */
 void reconstituer_fichiers(char * chemin_fich, char * dossier) {
 
@@ -156,6 +311,7 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
     int loop = 1;
     int char_loop = 1;
 
+
     int c;
 
     fich = fopen(chemin_fich, "r");
@@ -164,6 +320,8 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
         exit(EXIT_FAILURE);
     }
 
+    printf("reconstitue début\n");
+
 
     
     /* si le dossier de destination n'existe pas */
@@ -171,7 +329,7 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
         printf("Erreur: le dossier '%s' n'existe pas\n", dossier);
         exit(EXIT_FAILURE);
         
-        if (mkdir(dossier, 777)) {
+        if (mkdir(dossier, 0777)) {
             printf("Erreur de création du dossier '%s'\n", dossier);
             exit(EXIT_FAILURE);
         }
@@ -191,24 +349,29 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
             break;
         }
 
-        strcpy(chemin_fich_part, "");
+        /* enlever le saut de ligne à la fin */
+        chemin_size = strlen(line);
+        line[ chemin_size - 1 ] = '\0';
+
+        /* recréer les dossiers */
+        decomposer_creer(line, dossier);
+
+	strcpy(chemin_fich_part, "");
         if (dossier != NULL) {
             strcat(chemin_fich_part, dossier);
             strcat(chemin_fich_part, "/");
-        }
+	}
         strcat(chemin_fich_part, line);
-        /* enlever le saut de ligne à la fin */
-        chemin_size = strlen(chemin_fich_part);
-        chemin_fich_part[ chemin_size - 1 ] = '\0';
         
-        printf("compression de '%s'\n", chemin_fich_part);
+        printf("création de '%s'\n", chemin_fich_part);
 
         /* créer le fichier avec le bon nom */
         /* vérifier que le fichier n'existe pas déjà? */
         
-        fich_part = fopen(chemin_fich_part, "w");
+        fich_part = fopen(chemin_fich_part, "w+");
         if (fich_part == NULL) {
-            printf("erreur lors de la création du fichier %s\n", chemin_fich_part);
+            printf("erreur lors de la création du fichier '%s'\n", chemin_fich_part);
+            perror("fopen");
             exit(EXIT_FAILURE);
         }
 
@@ -218,11 +381,13 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
             if (c == 1) {
                 char_loop++;
             } else {
-                char_loop = 0;
-            }
-
-            if (char_loop < 3) {
-                fprintf(fich_part, "%c", c);
+	      /* écrire tous ceux que l'on a supposé etre le séparateur */
+		while (char_loop != 0) {
+		  fprintf(fich_part, "%c", 1);
+		  char_loop -= 1;
+		}
+		/* on écrit aussi le caractère qui vient d'etre lu */
+		fprintf(fich_part, "%c", c);
             }
         }
 
@@ -243,6 +408,8 @@ void decompression_multifichiers(FILE * f, char * nom_fichier, char * chemin_dos
     char chemin_decomp[100];
     
     /* décompresser l'archive */
+
+    printf("début décomp\n");
     
     boucle_decompresse(f, nom_fichier, NULL); /* NULL car on décompresse l'archive en un fichier temporaire dans le répertoire actuel */
 
@@ -324,6 +491,7 @@ int main(int argc, char * argv[]) {
 
         if (argc >= 4) {
             chemin_dossier = argv[3];
+            printf("AVEC DOSSIER\n");
         }
         decompression_multifichiers(fic, argv[2], chemin_dossier);
 
