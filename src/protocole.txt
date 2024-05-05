@@ -26,18 +26,19 @@ param fix : taille = 10 000, nb caractères diff = 8
 résultat attendu : compression de moins en moins efficace.
 
 2. freq croissante :
-1, 2, 4, 8, 16, 32, 64, 128 (total : 255)
+param fix : nb caractères diff = 8, frequence : 1, 2, 4, 8, 16, 32, 64, 128 (total : 255)
+taille : 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000, 10 000, 50 000, 100 000
 résultat attendu : compression efficace
 
 
 Test en fonction du nombre de fichiers :
-param fix : taille = 1 000, nb caractères diff = 32, même fréquence pour tous les caractères
+param fix : taille = 1 000, nb caractères diff = 64, même fréquence pour tous les caractères, nom des fichiers : nombre sur max 3 chiffre
 nb fichiers : 1, 2, 5, 10, 20, 50, 100, 200
 résultat attendu : taux de compression stable
 
 
 Test en fonction de la profondeur des dossiers :
-param fix : pas de fichier dans les dossiers
-profondeur : 0 correspond a la compression d'un dossier dans le répertoire courant, 1 correspond a la compression de 2 dossier, le deuxième est dans le premier, lui même dans le dossier courant, etc.
+param fix : 1 fichier par dossier => 1000 caractères, 32 différents, même fréquence
+profondeur : 0 correspond a la compression d'un dossier dans le répertoire courant et son dossier, 1 correspond a la compression de 2 dossier avec leurs fichiers, le deuxième est dans le premier, lui même dans le dossier courant, avec leurs fichiers etc.
 profondeur : 0, 1, 2, 5, 10, 20
 résultat attendu : compression de moins en moins efficace (parce qu'on a inclus le nom des répertoires, donc il y a de plus en plus de caractères à compresser)
