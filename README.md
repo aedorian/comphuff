@@ -6,6 +6,21 @@ on a enlevé le meilleur et le pire
 plus de 128 caractères: codage prend 1 octet donc compresse moins bien?
 nom du fichier est pris en compte dans la taille du fichier compressé
 
+parler des fonctions appelées à comp et décomp du multifichiers
+
+parler du séparateur et de comment on le lit et tout (on le rajoute si test mauvais)
+
+expliquer comment marche la v5 (recréation d'arborescence, etc...)
+
+quelles versions utilisées pour quels tests? justification (v1 plus efficace)
+
+FORMAT ENTETE
+PLUSIEURS FICHIERS
+	(reconstitue l'arborescence...)
+	V5 marche de la même manière mais avec un dossier du nom de l'archive qui englobe tout
+	
+ANALYSES
+
 nom de fichier différent à chaque version aurait été mieux
 
 ne compile pas les dossiers vides (à cacher?)
