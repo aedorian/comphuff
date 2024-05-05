@@ -1,45 +1,13 @@
 # Projet programmation impérative 3
 ## OUVERTURE BINAIRE DE LA BASE
 
-rapport: dire qu'on a pensé à 3 bits pour nb_bits
-on a enlevé le meilleur et le pire
-plus de 128 caractères: codage prend 1 octet donc compresse moins bien?
-nom du fichier est pris en compte dans la taille du fichier compressé
-
 parler des fonctions appelées à comp et décomp du multifichiers
 
 parler du séparateur et de comment on le lit et tout (on le rajoute si test mauvais)
 
 expliquer comment marche la v5 (recréation d'arborescence, etc...)
 
-quelles versions utilisées pour quels tests? justification (v1 plus efficace)
-
-FORMAT ENTETE
-PLUSIEURS FICHIERS
-	(reconstitue l'arborescence...)
-	V5 marche de la même manière mais avec un dossier du nom de l'archive qui englobe tout
-	
-ANALYSES
-
-nom de fichier différent à chaque version aurait été mieux
-
 ne compile pas les dossiers vides (à cacher?)
-
-peut bien faire une décomposition dans un dossier à chaque version
-
----
-
-attention: maintenant on encode nb_char - 1 (et on récupère nb_char le vrai)
-
----
-
-# A FAIRE (UPDATE)
-
-# DERNIERS PROBLEMES
-(ecrire chemin comme basename
-boucle séparée pour lire dans les fichiers ou fonction même nom mais différente de version à version)
-toujours bugs au niveau de getline
-FAIRE DOSSIERS SI EXISTENT PAS? DANS V3 ET PLUS
 
 TESTER SI DECOMPRESSION DANS UN DOSSIER MARCHE BIEN A CHAQUE FOIS
 
@@ -66,24 +34,8 @@ chaque version s'utilise avec chaque version (compressé de v1 peut pas être d�
 
 
 
-A. FICHIER TEMPORAIRE, JUSTE UN PEU PLUS POUR RECONSTITUER A FIN DE DECOMPRESSION
-B. SANS FICHIER TEMPORAIRE, REECRIRE COMPRESSION ET DECOMPRESSION ET GET ALPHABET
 
 
-# **DEUX TRUCS SPECIAUX**
-- refuser de décompresser si pas .comphuff?
----
-
-
-- autres versions
-- v6: afficher_arbre_graphique dans le GUI
-- remettre static des aux dans arbre.h?
-# QUESTIONS
-- comment stocker nom du fichier/chemin? deux approches (mp prof?)
-
----
-
-`xxd -b banane.txt.comphuff`
 
 A FAIRE
 - code source + makefile
@@ -92,9 +44,6 @@ A FAIRE
 - versions.txt (description)
 
 PRESENTATION
-- regarder notre entête
-- démo et étude du taux de compression
-- taille - 1 pour encoder la taille
 - table de correspondance pour noms de dossiers (quand profondeur grande)
 # TESTS A FAIRE (x,y)
 -> mettre la variance à chaque fois dans le CSV
@@ -106,27 +55,3 @@ PRESENTATION
 - DOSSIERS: nb_fichiers, sous-dossiers/profondeur dossiers
 1-100000 (logarithmique)
 10 ou 20 tirages pour une taille
-
-
-# ENTETE
-(nb_char_differents)[(char)(nb_bits)(code)...]
-- structure alphabet
-- nom origine fichier?
-
-# CONTENU
-code compressé des caractères du fichier
-
-- soit sauvegarde arbre directement
-- soit chaque deux octets (char)(code)
-	-> et recrée arbre petit à petit
-- nombre max de nb_bits possible?
-
-# Ajouté depuis dernière fois
-
-- noeuds sont au début du tableau normalement lors de la création à partir du nombre d'occurence des caractères
-
-atension:
-- (4.2.7) arbre "Une banane" différent? pas grave?
-- (4.2) "codage dans l'arbre" même chose que nb d'occurences? PAS SÛR DANS arbre.c à l'assignation de n->codage
-- (4.2) j'ai séparé afficher_occurences et creer_noeuds_caracteres, mieux dans une seule boucle?
-- (4.2.6) si je mets un < au lieu de <= pour le test min, change des choses (mais <= a l'air mieux)
