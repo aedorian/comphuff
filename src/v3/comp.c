@@ -14,7 +14,6 @@ void occurence(FILE *fic, int tab[256]) {
     int c; /* pas char */
     
     while ((c = fgetc(fic)) != EOF) {
-        printf("%c %d", c, c);
         tab[(int)c] += 1;
     }
 }
@@ -86,7 +85,6 @@ void deux_entiers_petits(noeud * arbre_huffman[256], int * i1, int * i2) {
     *i1 = -1;
 
     for (i = 0; i < 256; i++) {
-        if (arbre_huffman[i] != NULL) printf("%d ", arbre_huffman[i]->occurence);
         
         if (arbre_huffman[i] != NULL && arbre_huffman[i]->occurence <= min) {
             *i2 = *i1; /* i2 prend l'ancienne valeur de i1 */
@@ -131,9 +129,7 @@ void creer_noeud(noeud * tab[]) {
     new->c = 0;
     /* on vérifie si on a pu trouver un deuxième noeud plus petit (gestion du cas à un seul caractère) */
     if (i2 == -1) {
-        printf("ye\n");
         new->occurence = tab[i1]->occurence;
-        printf("OK\n");
     }
     else {
         new->occurence = tab[i1]->occurence + tab[i2]->occurence;
@@ -171,7 +167,7 @@ void creer_code(noeud * element, int code, int profondeur, noeud * alphabet[256]
             element -> nb_bits = profondeur;
             /* rajouté */
         
-            affichage_code(profondeur, code);
+            /* affichage_code(profondeur, code); */
 
             /* stockage dans la structure alphabet */
             alphabet[(int)element -> c] = element;
@@ -235,8 +231,6 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
         exit(EXIT_FAILURE);
     }
 
-    printf("passe début, nb_char = %d\n", nb_char);
-
     /* écriture de l'en-tête */
     /* on écrit un emplacement à remplacer par le rewind de la fin pour le dépassement */
     c = 0;
@@ -244,10 +238,8 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     
     /* écriture du nombre de caractères différents */
     /* FONCTION CUSTOM INT TO CHAR */
-    printf("3: %d\n", int2char(3));
     c = int2char(nb_char-1); /* NB_CHAR - 1 */
     fwrite(&c, sizeof(char), 1, comp);
-    printf("NB CHAR %d\n", c);
     
 
     /* écriture de la structure alphabet : [(char)(nb_bits)(codage)] * nb_char */
@@ -268,8 +260,6 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
             }
         }
     }
-
-    printf("passe écrire alphabet\n");
 
 
     /* écriture du contenu */
@@ -304,10 +294,6 @@ void creer_compresse(char * nom_fichier, FILE* fic, int nb_char, noeud * alphabe
     fclose(comp);
 }
 
-void dbg(char * s) {
-    printf("%s\n", s);
-}
-
 /* boucle principale pour compresser un fichier et l'ajouter à la fin d'un nouveau fichier compressé */
 /* on suppose fic déjà ouvert */
 void boucle_compresse(FILE * fic, char * nom_fic) {
@@ -323,17 +309,11 @@ void boucle_compresse(FILE * fic, char * nom_fic) {
     initialiser_occurences(tab);
     initialiser_arbre_huffman(arbre_huffman);
 
-    dbg("passe init arbre huff");
-
     /* appel de la fonction occurence */
     occurence(fic, tab);
-
-    dbg("passe occurence");
     
     /* on obtient le nombre de caractères différents et on crée des noeuds pour chaque caractère */
     n_huffman = creer_noeuds_caracteres(tab, arbre_huffman);
-
-    dbg("passe cree noeud caracteres");
 
     /* on affiche les occurences de chaque caractère (si il y a eu une occurence) */
     /* afficher_occurences(arbre_huffman); */
@@ -359,16 +339,11 @@ void boucle_compresse(FILE * fic, char * nom_fic) {
     /* créer l'alphabet */
     creer_code(arbre_huffman[0], 0, 0, alphabet);
 
-    dbg("passe cree alphabet");
-
-    debug_alphabet(alphabet);
-
     afficher_arbre_graphique(arbre_huffman[0]);
 
     /* créer le fichier compressé */
     /* ATTENTION POUR ETENDRE LES OPTIONS */
     creer_compresse(nom_fic, fic, n_huffman, alphabet);
-
-    dbg("passe creer compresse");
+    
     /* afficher_arbre_graphique(arbre_huffman[0]);*/
 }

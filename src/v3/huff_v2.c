@@ -49,7 +49,6 @@ void ecrire_fichier_dans_fichier_tmp(FILE * fich_tmp, char * chemin) {
     }
 
     /* POUR LA V2: ON ECRIT LE CHEMIN COMME BASENAME */
-    /* ATTENTION POUR AUTRES VERSIONS */
     fprintf(fich_tmp, "%s\n", nom_fich_base(chemin));
 
     /* on écrit le contenu du fichier */
@@ -86,8 +85,6 @@ void compiler_dans_fichier_tmp(char * argv[], int argc) {
         if (fichier_valide == 1) {
 
             ecrire_fichier_dans_fichier_tmp(fich_tmp, argv[i_fich]);
-
-            printf("fichier '%s' bien traité\n", argv[i_fich]);
         }
         else {
             printf("erreur: le fichier '%s' n'a pas pu être traité (c'est soit un dossier, soit il n'existe pas)\n", argv[i_fich]);
@@ -108,8 +105,6 @@ void compression_multifichiers(char * argv[], int argc) {
     /* première étape: compilation de tous les fichiers dans un fichier temporaire */
     
     compiler_dans_fichier_tmp(argv, argc);
-    
-    printf("fin de compilation dans un fichier, début compression\n");
 
     /* deuxième étape: compression de ce fichier en un fichier compressé */
 
@@ -181,8 +176,7 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
     
 
     while (loop == 1) {
-        printf("scan\n");
-        
+       
         /* obtenir le nom */
         /* fscanf(fich, "%[^\n]", line) == -1 */
         if (getline(&line, &len, fich) == -1) {
@@ -200,8 +194,6 @@ void reconstituer_fichiers(char * chemin_fich, char * dossier) {
         /* enlever le saut de ligne à la fin */
         chemin_size = strlen(chemin_fich_part);
         chemin_fich_part[ chemin_size - 1 ] = '\0';
-        
-        printf("compression de '%s'\n", chemin_fich_part);
 
         /* créer le fichier avec le bon nom */
         /* vérifier que le fichier n'existe pas déjà? */
@@ -246,18 +238,12 @@ void decompression_multifichiers(FILE * f, char * nom_fichier, char * chemin_dos
     
     boucle_decompresse(f, nom_fichier, NULL); /* NULL car on décompresse l'archive en un fichier temporaire dans le répertoire actuel */
 
-    printf("fin boucle décompresse\n");
-
     /* on crée le chemin du fichier qui a été décompressé */
     strcpy(chemin_decomp, nom_fichier);
     strcat(chemin_decomp, ".decomp");
 
-    printf("fin refait fichier %s\n", chemin_decomp);
-
     /* reconstituer les fichiers (dans chemin_dossier si précisé) */
     reconstituer_fichiers(chemin_decomp, chemin_dossier);
-
-    printf("fin reconstitue\n");
 
     /* supprimer le fichier temporaire */
     if (remove(chemin_decomp) != 0) {
@@ -304,9 +290,6 @@ int main(int argc, char * argv[]) {
         }
 
         compression_multifichiers(argv, argc);
-
-        /* appel de compression */
-        printf("compr\n");
         
         break;
     case 'd':
@@ -328,14 +311,6 @@ int main(int argc, char * argv[]) {
         decompression_multifichiers(fic, argv[2], chemin_dossier);
 
         fclose(fic);
-
-        /* A ENLEVER */
-        if (argc < 4) {
-            printf("decomp sans dossier cible\n");
-        }
-        else {
-            printf("decomp dossier cible\n");    
-        }
         
         break;
     case 'h':

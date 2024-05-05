@@ -66,13 +66,11 @@ char int2char(int n) {
   int buffer[8];
 
   for (i = 7; i >= 0; i--) {
-    printf("n = %d\n", n);
     buffer[i] = (unsigned int)n % 2;
     n = n >> 1;
   }
 
   for (i = 7; i >= 0; i--) {
-    printf("%d : %d (on ajoute %d)\n", i, buffer[i], buffer[i] * puiss_2(i));
     final += buffer[7-i] * puiss_2(i);
   }
 
@@ -107,18 +105,4 @@ int est_fichier(char * chemin) {
 
 char * nom_fich_base(char * chemin) {
     return basename(chemin);
-}
-
-void debug_alphabet(noeud * a[256]) {
-    int i;
-
-    for (i = 0; i < 256; i++) {
-        printf("%d\n", i);
-        if (a[i] != NULL) {
-            printf("a[%d] : ", i);
-            printf("%c ", a[i]->c);
-            affichage_code(a[i]->nb_bits, a[i]->codage);
-            printf("\n");
-        }
-    }
 }

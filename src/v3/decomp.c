@@ -24,10 +24,6 @@ noeud * lire_bit_arbre(noeud * arbre_huffman, noeud * parcours, int bit, FILE * 
     return parcours;
 }
 
-void debug(char * s) {
-    printf("%s\n", s);
-}
-
 /* Permet de décompresser le fichier binaire f formaté : dépacement, nombre de caractères différents, structure alphabet, contenu compressé.
 Retourne l'abre de codage associé au fichier f compressé. */
 noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) {
@@ -71,12 +67,10 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     if (fscanf(f, "%c", &depassement) != 1) {
         fprintf(stderr, "Erreur de lecture du dépacement\n");
     }
-    if (fscanf(f, "%c", &nb_chars) != 1) {
+    if (fscanf(f, "%c", (char*)&nb_chars) != 1) {
         fprintf(stderr, "Erreur de lecture du nombre de caractères différents\n");
     }
     nb_chars += 1; /* on a ajouté -1 avant */
-
-    printf("passe dépassement (dep = %d) (nb_chars = %d)\n", depassement, nb_chars);
 
     /* on lit l'alphabet entier (il y a nb_chars caractères différents) */
     nb_chars_lus = 0;
@@ -86,7 +80,6 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         if (fscanf(f, "%c", &c) != 1) {
             fprintf(stderr, "Erreur de lecture de l'alphabet\n");
         }
-        debug("on lit un char");
         /* on convertit les 8 bits en un tableau de int (buffer_c) */
         char2bin(c, buffer_c);
 
@@ -125,7 +118,6 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
                     a_obtenir = CHAR;
 
 		    if (char_lu == 0) {
-		      printf("A ZERO\n");
 		      debut = 0;
 		    }
 
@@ -137,7 +129,6 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
                         exit(EXIT_FAILURE);  /* EXIT ??? NULL ? */
                     }
 
-                    printf("char lu: %d %c (codage: %d | nb_bits = %d)\n", char_lu, char_lu, lu, taille_code);
                     alphabet[char_lu]->c = char_lu;
                     alphabet[char_lu]->codage = lu;
                     alphabet[char_lu]->nb_bits = taille_code;
@@ -150,18 +141,12 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         }
     }
 
-    debug("passe entete");
-
-    printf("test? %d\n", alphabet[0] == NULL);
-
     /* debug_alphabet(alphabet);*/
 
     /* FIN DE LECTURE DE L'ALPHABET */
     /* on ne ferme pas le fichier, on l'utilisera plus tard pour lire le contenu du fichier */
     
     arbre_huffman = creer_huffman_inverse(alphabet, debut);
-
-    debug("passe huffman");
 
     /* ECRITURE DU FICHIER */
     /* création du nom du fichier décompressé */
@@ -180,8 +165,6 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         exit(EXIT_FAILURE);
     }
 
-    debug("passe créer fich\n");
-
     afficher_arbre_graphique(arbre_huffman);
    
     /* on commence au début */
@@ -194,9 +177,6 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
         parcours = lire_bit_arbre(arbre_huffman, parcours, buffer_c[j], fic_decomp);
         j++;
     }
-
-    
-    debug("passe début");
 
     /* si il y a encore des octets à lire... */
     /* si on lit un octet, on boucle. sinon pas de boucle */
@@ -227,8 +207,6 @@ noeud * boucle_decompresse(FILE * f, char * nom_fichier, char * chemin_dossier) 
     }
 
     fclose(fic_decomp);
-
-    printf("passe tout\n");
 
     return arbre_huffman;
 }
@@ -264,12 +242,9 @@ noeud * creer_huffman_inverse(noeud * alphabet[256], int debut) {
     char * chaine_code;
     int i;
 
-    debug("huffman inverse go");
-
     arbre_huffman = creer_arbre('.', NULL, NULL); /* crée un noeud */
 
     for (i = debut; i < 256; i++) {
-      printf("i étape %d test %d\n", i);
         if (alphabet[i] != NULL) {
             
             /* générer la chaîne de caractères */
