@@ -1,0 +1,95 @@
+--------------------------------------
+
+YUNGMANN Tom - AUBE Adrian
+Projet de programmation impérative 3
+Université Jean Monnet
+L2 Informatique
+
+--------------------------------------
+
+Arborescence:
+
+      YUNGMANN_AUBE/
+                README.txt               (ici)
+                src/
+                        huff/            (projet)
+                        tests/           (fichiers et programmes de test)
+                presentation/            (présentation Beamer)
+
+--------------------------------------
+
+Créer l'exécutable principal
+
+      make clean; make huff_v[version]
+      [version] de 0 à 5 compris
+
+--------------------------------------
+
+Créer l'exécutable de la génération de fichiers de tests
+
+      make clean; make
+
+--------------------------------------
+
+Comment générer les fichiers de tests?
+
+      ./test.sh
+
+rm : - chmod u+x test.sh peut être nécessaire
+     - Ne pas avoir de fichier constituer seulement d'un numéro, ni de dossier nommé "0"
+
+--------------------------------------
+
+Comment générer la présentation?
+
+      pdflatex presentation.tex
+
+      (le pdf est également disponible dans presentation.pdf)
+
+--------------------------------------
+
+
+Protocole :
+
+Test en fonction de la taille du fichier :
+param fix : nb caractères diff = 32, même fréquence pour tous les caractères
+taille : 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000, 10 000, 50 000, 100 000
+résultat attendu : compression inefficace en dessous de 50 caractères.
+
+
+Test en fonction du nombre de carac diff :
+param fix : taille = 10 000, même fréquence pour tous les caractères
+nb caractères diff : 1, 2, 4, 8, 16, 32, 64, 128, 256
+résultat attendu : compression de moins en moins efficace.
+
+
+Test en fonction de la fréquence des caractères :
+param fix : taille = 10 000, nb caractères diff = 8
+1. caractère dominant :
+93%, autres : 1%
+47,47%, 47,47%, autres : 1%
+31,66%, 31,66%, 31,66%, autres 1%
+24%, 24%, 24%, 24%, autres 1%
+19,4%, 19,4%, 19,4%, 19,4%, 19,4%, autres 1%
+16,33%, 16,33%, 16,33%, 16,33%, 16,33%, 16,33%, autres 1%
+14,14%, 14,14%, 14,14%, 14,14%, 14,14%, 14,14%, 14,14%, autre 1%
+12,5% tous
+résultat attendu : compression de moins en moins efficace.
+
+2. freq croissante :
+param fix : nb caractères diff = 8, frequence : 1, 2, 4, 8, 16, 32, 64, 128 (total : 255)
+taille : 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000, 10 000, 50 000, 100 000
+résultat attendu : compression efficace
+
+
+Test en fonction du nombre de fichiers :
+param fix : taille = 1 000, nb caractères diff = 64, même fréquence pour tous les caractères, nom des fichiers : nombre sur max 3 chiffre
+nb fichiers : 1, 2, 5, 10, 20, 50, 100, 200
+résultat attendu : taux de compression stable
+
+
+Test en fonction de la profondeur des dossiers :
+param fix : 1 fichier par dossier => 1000 caractères, 32 différents, même fréquence
+profondeur : 0 correspond a la compression d'un dossier dans le répertoire courant et son dossier, 1 correspond a la compression de 2 dossier avec leurs fichiers, le deuxième est dans le premier, lui même dans le dossier courant, avec leurs fichiers etc.
+profondeur : 0, 1, 2, 5, 10, 20
+résultat attendu : compression de moins en moins efficace (parce qu'on a inclus le nom des répertoires, donc il y a de plus en plus de caractères à compresser)
