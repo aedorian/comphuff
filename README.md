@@ -1,4 +1,4 @@
-# Huffman codingbased compression
+## Huffman coding based compression
 
 Project for a programming class. The following instructions are in french
 
